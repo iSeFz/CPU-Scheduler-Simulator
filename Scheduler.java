@@ -18,7 +18,7 @@ public abstract class Scheduler {
     public abstract double avgTurnaroundTime();
 
     // Main function to run the scheduler
-    public void startScheduler() {
+    public void PrintOUTPUT() {
         // Simple counter to make printing more readable
         Integer counter = 1;
 
@@ -44,4 +44,6 @@ public abstract class Scheduler {
         // Print the average turnaround time of the processes
         System.out.println("Average Turnaround Time: " + this.avgTurnaroundTime());
     }
+
+    public abstract void startScheduler();
 }
