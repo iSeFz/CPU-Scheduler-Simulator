@@ -18,29 +18,37 @@ public abstract class Scheduler {
     public abstract double avgTurnaroundTime();
 
     // Main function to run the scheduler
-    public abstract void startScheduler();
-
-    // Common method between different scheduling algorithms
-    // Used to print the desired output after simulating the scheduling
     public void PrintOUTPUT() {
+        // Simple counter to make printing more readable
+        Integer counter = 1;
+
         // Print the execution order of the processes
         System.out.println("\tExecution Order Of Processes");
         for (Process p : this.executionOrder())
-            System.out.print(" => " + p.getName());
+            System.out.println(counter++ + ". " + p.getName());
 
+        counter = 1; // Reset the counter
         // Print the waiting time of the processes
-        System.out.println("\n\tWaiting Time Of Processes");
+        System.out.println("\tWaiting Time Of Processes");
         for (Integer time : this.waitingTime())
-            System.out.print(" => " + time);
+            System.out.println("Process #" + counter++ + ": " + time);
 
+        counter = 1; // Reset the counter
         // Print the turnaround time of the processes
-        System.out.println("\n\tTurnaround Time Of Processes");
+        System.out.println("\tTurnaround Time Of Processes");
         for (Integer time : this.turnaroundTime())
-            System.out.print(" => " + time);
+            System.out.println("Process #" + counter++ + ": " + time);
 
         // Print the average waiting time of the processes
-        System.out.println("\nAverage Waiting Time: " + this.avgWaitingTime());
+        System.out.println("Average Waiting Time: " + this.avgWaitingTime());
         // Print the average turnaround time of the processes
         System.out.println("Average Turnaround Time: " + this.avgTurnaroundTime());
+    }
+
+    public abstract void startScheduler();
+
+    public void simulate() {
+        startScheduler();
+        PrintOUTPUT();
     }
 }
