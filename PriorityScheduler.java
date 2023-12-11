@@ -48,6 +48,6 @@ public class PriorityScheduler extends Scheduler {
         // Print the name of the scheduler
         System.out.println("\tNon-Preemptive Priority Scheduler");
         // Call the main function of the abstract class
-        super.startScheduler(this);
+        //super.startScheduler(this);
     }
 }

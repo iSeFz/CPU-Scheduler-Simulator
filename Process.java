@@ -8,14 +8,14 @@ public class Process {
     int CompletionTime;
     int RemainingTime; // for SJF and AG scheduling.
     int Quantum; // for AG scheduling.
+    int tempQuantum; // for AG scheduling.
     int AGFactor; // for AG scheduling.
 
     // Constructor to initialize or create new Process
-    public Process(String name, int arrivalTime, int burstTime, int priorityNumber) {
+    public Process(String name, int arrivalTime, int burstTime) {
         this.name = name;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
-        this.priorityNumber = priorityNumber;
     }
 
     // Getters for process attributes
@@ -104,5 +104,13 @@ public class Process {
 
     public void setAGFactor(int agFactor) {
         AGFactor = agFactor;
+    }
+
+    public void setTempQuantum(int tempQuantum) {
+        this.tempQuantum = tempQuantum;
+    }
+
+    public int getTempQuantum() {
+        return tempQuantum;
     }
 }

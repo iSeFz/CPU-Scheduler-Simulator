@@ -46,4 +46,9 @@ public abstract class Scheduler {
     }
 
     public abstract void startScheduler();
+
+    public void simulate() {
+        startScheduler();
+        PrintOUTPUT();
+    }
 }
