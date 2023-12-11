@@ -5,7 +5,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
 
-public class AG extends Scheduler {
+public class AGScheduler extends Scheduler {
     Scanner Input;
     int NumOfProcesses;
     ArrayList<Process> mProcesses;
@@ -19,7 +19,7 @@ public class AG extends Scheduler {
     int TotalTurnAround;
     int TotalWaitingTime;
 
-    public AG() {
+    public AGScheduler() {
         this.Input = new Scanner(System.in);
         this.NumOfProcesses = 0;
         this.mProcesses = new ArrayList<>();
