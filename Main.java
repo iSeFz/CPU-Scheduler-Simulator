@@ -39,20 +39,54 @@ public class Main {
             newProcess.setPriority(pPriorityNumber);
             processList.add(newProcess);
         }
-        scanner.close();
 
-        /* // For Testing
-        Process p1 = new Process("P1", 0, 4, 3);
-        Process p2 = new Process("P2", 1, 3, 2);
-        Process p3 = new Process("P3", 1, 5, 1);
+        // Allow the user to choose from different scheduling algorithms
+        System.out.println("\n\tAvailable Scheduling Algorithms" +
+                "\n1. Non-Preemptive Shortest Job First\n" +
+                "2. Shortest Remaining Time First\n" +
+                "3. Non-Preemptive Priority Scheduling\n" +
+                "4. AG Scheduling");
+        System.out.print("Choose scheduling algorithm to apply (1-4) >> ");
+        int choice = scanner.nextInt();
+        if (choice == 1) {
+            System.out.println("\tMaintenance in progress!");
+            // ShortestJobScheduler SJF = new ShortestJobScheduler(processList, contextSwitchingTime);
+            // SJF.startScheduler();
+        } else if (choice == 2) {
+            System.out.println("\tComing Soon!");
+            // SRTFScheduler SRTF = new SRTFScheduler(processList);
+            // SRTF.startScheduler();
+        } else if (choice == 3) {
+            PriorityScheduler priority = new PriorityScheduler(processList, contextSwitchingTime);
+            priority.startScheduler();
+        } else if (choice == 4) {
+            System.out.println("\tComing Soon!");
+            // AGScheduler AG = new AGScheduler();
+            // AG.startScheduler();
+        }
+        scanner.close();
+        System.out.println("\tThanks for using our CPU Scheduler Simulator!");
+
+        /* // Priority Scheduler Lecture Example CH6 Slide #22
+        Process p1 = new Process("P1", 0, 10);
+        p1.setPriority(3);
+        Process p2 = new Process("P2", 0, 1);
+        p2.setPriority(1);
+        Process p3 = new Process("P3", 0, 2);
+        p3.setPriority(4);
+        Process p4 = new Process("P4", 0, 1);
+        p4.setPriority(5);
+        Process p5 = new Process("P5", 0, 5);
+        p5.setPriority(2);
         // Add the processes to the list
+        ArrayList<Process> processes = new ArrayList<>();
         processes.add(p1);
         processes.add(p2);
         processes.add(p3);
+        processes.add(p4);
+        processes.add(p5);
         // Create a scheduler for the processes
-        PriorityScheduler priority = new PriorityScheduler(processes);
-        priority.startScheduler();
-        
-        */
+        PriorityScheduler priority = new PriorityScheduler(processes, 0);
+        priority.startScheduler(); */
     }
 }
