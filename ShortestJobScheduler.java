@@ -73,21 +73,21 @@ public class ShortestJobScheduler extends Scheduler {
         while (resultList.size() != processes.size()) {
             if (ArrivedProcesses.isEmpty()) { // to handle if there is process will arrive after all process was arrived done
                 ArrivedProcesses.add(processes.get(counter++));
-                if (currentTime < ArrivedProcesses.getFirst().getArrivalTime())
-                    currentTime = ArrivedProcesses.getFirst().getArrivalTime();
+                if (currentTime < ArrivedProcesses.get(0).getArrivalTime())
+                    currentTime = ArrivedProcesses.get(0).getArrivalTime();
             }
             // to take all processes that will arrive during current time
             for (; counter < processes.size() && processes.get(counter).getArrivalTime() <= currentTime; counter++) {
                 ArrivedProcesses.add(processes.get(counter));
             }
             ArrivedProcesses.sort(new compareBurst());
-            resultList.add(ArrivedProcesses.getFirst());
-            resultList.getLast().setWaitingTime(currentTime - resultList.getLast().getArrivalTime());
-            avgWaitingTime += currentTime - resultList.getLast().getArrivalTime();
-            currentTime += ArrivedProcesses.getFirst().getBurstTime();
-            resultList.getLast().setCompletionTime(currentTime);
-            resultList.getLast().setTurnAroundTime(currentTime - resultList.getLast().getArrivalTime());
-            avgTurnaroundTime += currentTime - resultList.getLast().getArrivalTime();
+            resultList.add(ArrivedProcesses.get(0));
+            resultList.get(resultList.size()-1).setWaitingTime(currentTime - resultList.get(resultList.size()-1).getArrivalTime());
+            avgWaitingTime += currentTime - resultList.get(resultList.size()-1).getArrivalTime();
+            currentTime += ArrivedProcesses.get(0).getBurstTime();
+            resultList.get(resultList.size()-1).setCompletionTime(currentTime);
+            resultList.get(resultList.size()-1).setTurnAroundTime(currentTime - resultList.get(resultList.size()-1).getArrivalTime());
+            avgTurnaroundTime += currentTime - resultList.get(resultList.size()-1).getArrivalTime();
             ArrivedProcesses.removeFirst();
             currentTime += contextTime;
         }
