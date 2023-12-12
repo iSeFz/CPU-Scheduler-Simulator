@@ -67,17 +67,17 @@ public class Main {
         scanner.close();
         System.out.println("\tThanks for using our CPU Scheduler Simulator!");
 
-        /* // Priority Scheduler Lecture Example CH6 Slide #22
-        Process p1 = new Process("P1", 0, 10);
+        /* // For Fast Testing
+        Process p1 = new Process("P1", 0, 4);
         p1.setPriority(3);
-        Process p2 = new Process("P2", 0, 1);
-        p2.setPriority(1);
-        Process p3 = new Process("P3", 0, 2);
+        Process p2 = new Process("P2", 2, 1);
+        p2.setPriority(2);
+        Process p3 = new Process("P3", 4, 2);
         p3.setPriority(4);
-        Process p4 = new Process("P4", 0, 1);
-        p4.setPriority(5);
-        Process p5 = new Process("P5", 0, 5);
-        p5.setPriority(2);
+        Process p4 = new Process("P4", 6, 1);
+        p4.setPriority(1);
+        Process p5 = new Process("P5", 12, 5);
+        p5.setPriority(5);
         // Add the processes to the list
         ArrayList<Process> processes = new ArrayList<>();
         processes.add(p1);
@@ -86,7 +86,7 @@ public class Main {
         processes.add(p4);
         processes.add(p5);
         // Create a scheduler for the processes
-        PriorityScheduler priority = new PriorityScheduler(processes, 0);
+        PriorityScheduler priority = new PriorityScheduler(processes, 2);
         priority.startScheduler(); */
     }
 }
