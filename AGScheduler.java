@@ -12,18 +12,20 @@ public class AGScheduler extends Scheduler {
     ArrayList<Process> mTemp;
     ArrayList<Process> mOutput;
     ArrayList<Process> mDeadList;
-    ArrayList<Integer> mTimeLine;
+    // ArrayList<Integer> mTimeLine;
     Queue<Process> readyQueue;
+    int TimeLine;
     int MaxTime;
     int TotalQuantum;
     int TotalTurnAround;
     int TotalWaitingTime;
+    int ContextSwitching;
 
     public AGScheduler() {
         this.Input = new Scanner(System.in);
         this.NumOfProcesses = 0;
         this.mProcesses = new ArrayList<>();
-        this.mTimeLine = new ArrayList<>();
+        this.TimeLine = 0;
         this.mTemp = new ArrayList<>();
         this.mOutput = new ArrayList<>();
         this.mDeadList = new ArrayList<>();
@@ -32,6 +34,37 @@ public class AGScheduler extends Scheduler {
         this.TotalQuantum = 0;
         this.TotalTurnAround = 0;
         this.TotalWaitingTime = 0;
+    }
+
+    public AGScheduler(ArrayList<Process> processList, int ContextSwitching) {
+        this.mTemp = new ArrayList<>();
+        this.mOutput = new ArrayList<>();
+        this.mDeadList = new ArrayList<>();
+        this.readyQueue = new LinkedList<>();
+        this.mProcesses = new ArrayList<>();
+
+        this.ContextSwitching = ContextSwitching;
+        int i = 0;
+        for (Process process : processList) {
+            process.setTempQuantum(process.getQuantum());
+            process.setRemainingTime(process.getBurstTime());
+            process.setWaitingTime(TimeLine - process.getArrivalTime());
+            this.MaxTime = process.getBurstTime();
+
+            if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
+                this.MaxTime = process.getBurstTime() + process.getArrivalTime();
+
+            // calculate AG factor
+            int AGFactor = calculate_AG_Factor(process);
+            // setting AG factor
+            process.setAGFactor(AGFactor);
+
+            this.mProcesses.add(process);
+            // this.mTemp.add(process);
+            i++;
+
+        }
+        this.NumOfProcesses = processList.size();
     }
 
     @Override
@@ -112,29 +145,29 @@ public class AGScheduler extends Scheduler {
     // get user input return <list>process
 
     // should be done after taking input after regular input from user
-    public void getInput(List<Process> processes) {
-        System.out.println("Enter quantum Time of process : ");
-        int processQT = this.Input.nextInt();
+    // public void getInput(List<Process> processes) {
+    // System.out.println("Enter quantum Time of process : ");
+    // int processQT = this.Input.nextInt();
 
-        for (Process process : processes) {
-            process.setQuantum(processQT);
-            process.setTempQuantum(processQT);
-            process.setRemainingTime(process.getBurstTime());
-            this.MaxTime = process.getBurstTime();
+    // for (Process process : processes) {
+    // process.setQuantum(processQT);
+    // process.setTempQuantum(processQT);
+    // process.setRemainingTime(process.getBurstTime());
+    // this.MaxTime = process.getBurstTime();
 
-            if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
-                this.MaxTime = process.getBurstTime() + process.getArrivalTime();
+    // if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
+    // this.MaxTime = process.getBurstTime() + process.getArrivalTime();
 
-            // calculate AG factor
-            int AGFactor = calculate_AG_Factor(process);
-            // setting AG factor
-            process.setAGFactor(AGFactor);
+    // // calculate AG factor
+    // int AGFactor = calculate_AG_Factor(process);
+    // // setting AG factor
+    // process.setAGFactor(AGFactor);
 
-            this.mProcesses.add(process);
-            // this.mTemp.add(process);
+    // this.mProcesses.add(process);
+    // // this.mTemp.add(process);
 
-        }
-    }
+    // }
+    // }
 
     // Print [Time ] -> Quantum ( )
     public void printUpdates(int time) {
@@ -145,7 +178,7 @@ public class AGScheduler extends Scheduler {
         System.out.print(") -> ceil(50%) = ( ");
         for (int i = 0; i < this.mProcesses.size(); i++)
             System.out.print((int) Math.ceil((this.mProcesses.get(i).getQuantum()) * 0.5) + " ");
-        System.out.print(")		");
+        System.out.println(")		");
     }
 
     // Sorting Processes in List
@@ -178,23 +211,22 @@ public class AGScheduler extends Scheduler {
 
     @Override
     public void startScheduler() {
-        //Process process = mProcesses.get(0);
+        // Process process = mProcesses.get(0);
         int lastProcessAGFactor = 0;
-        //int quantum = process.getQuantum();
-        boolean addedInTimeLine = false;
+        // int quantum = process.getQuantum();
+        // boolean addedInTimeLine = false;
         int indexOfProcess = 0;
 
         for (int time = 0; time < this.MaxTime; time++) {
-            if (addedInTimeLine)
-                this.mTimeLine.add(time);
-            addedInTimeLine = true;
+            // TimeLine++;
 
             sortProcesses(time);
             printUpdates(time);
 
             // Non-Preemptive
             if (mProcesses.size() != 0 && this.mProcesses.get(indexOfProcess).getArrivalTime() <= time) {
-                Process tempProcess = new Process(this.mProcesses.get(indexOfProcess).getName(), this.mProcesses.get(indexOfProcess).getArrivalTime(),
+                Process tempProcess = new Process(this.mProcesses.get(indexOfProcess).getName(),
+                        this.mProcesses.get(indexOfProcess).getArrivalTime(),
                         this.mProcesses.get(indexOfProcess).getBurstTime());
 
                 tempProcess.setPriority(this.mProcesses.get(indexOfProcess).getPriority());
@@ -209,12 +241,13 @@ public class AGScheduler extends Scheduler {
                 if (lastProcessAGFactor != tempProcess.getAGFactor()) {
                     this.mOutput.add(tempProcess);
                     lastProcessAGFactor = tempProcess.getAGFactor();
-                    this.mTimeLine.add(time);
+                    // this.mTimeLine.add(time);
                 }
 
                 // Updating the waiting time and the remaining time of the current process,
                 time += Math.min(tempProcess.getRemainingTime(), (int) Math.ceil(tempProcess.getQuantum() * 0.5));
-                tempProcess.setRemainingTime(tempProcess.getRemainingTime() - Math.min((int) Math.ceil(tempProcess.getQuantum() * 0.5), tempProcess.getRemainingTime()));
+                tempProcess.setRemainingTime(tempProcess.getRemainingTime()
+                        - Math.min((int) Math.ceil(tempProcess.getQuantum() * 0.5), tempProcess.getRemainingTime()));
 
                 // Preemptive
                 int remainingHalfQT = (int) Math.floor(tempProcess.getQuantum() * 0.5);
@@ -223,7 +256,8 @@ public class AGScheduler extends Scheduler {
                     boolean flag = false;
 
                     for (index = 0; index < this.mProcesses.size(); index++) {
-                        if (this.mProcesses.get(index).getAGFactor() < tempProcess.getAGFactor() && this.mProcesses.get(index).getArrivalTime() <= time) {
+                        if (this.mProcesses.get(index).getAGFactor() < tempProcess.getAGFactor()
+                                && this.mProcesses.get(index).getArrivalTime() <= time) {
                             flag = true;
                             break;
                         }
@@ -231,12 +265,14 @@ public class AGScheduler extends Scheduler {
 
                     if (flag) { // there is a process with smaller AG Factor
                         tempProcess.setQuantum(tempProcess.getRemainingTime() + tempProcess.getQuantum());
-                        tempProcess.setBurstTime(tempProcess.getBurstTime() - (tempProcess.getBurstTime() - tempProcess.getRemainingTime()));
+                        tempProcess.setBurstTime(tempProcess.getBurstTime()
+                                - (tempProcess.getBurstTime() - tempProcess.getRemainingTime()));
                         this.readyQueue.add(tempProcess);
                         indexOfProcess = index;
                         break; // may have update later for exiting the temp process
                     } else { // there isn't a process with smaller AG Factor
-                        Process nextProcess =  new Process(this.mProcesses.get(index).getName(), this.mProcesses.get(index).getArrivalTime(),
+                        Process nextProcess = new Process(this.mProcesses.get(index).getName(),
+                                this.mProcesses.get(index).getArrivalTime(),
                                 this.mProcesses.get(index).getBurstTime());
 
                         nextProcess.setPriority(this.mProcesses.get(index).getPriority());
@@ -251,6 +287,7 @@ public class AGScheduler extends Scheduler {
                         this.readyQueue.add(nextProcess);
                     }
 
+                    // Process Quantum is done but there is still some progress to do
                     if (tempProcess.getTempQuantum() == 0 && tempProcess.getBurstTime() != 0) {
                         Process tempQueueProcess = this.readyQueue.peek();
 
@@ -263,11 +300,14 @@ public class AGScheduler extends Scheduler {
 
                         int mean = ((int) Math.ceil((this.TotalQuantum / this.NumOfProcesses) * 0.1));
                         tempProcess.setQuantum(tempProcess.getQuantum() + mean);
-                        tempProcess.setBurstTime(tempProcess.getBurstTime() - (tempProcess.getBurstTime() - tempProcess.getRemainingTime())); // may change later if there are errors
+                        tempProcess.setBurstTime(tempProcess.getBurstTime()
+                                - (tempProcess.getBurstTime() - tempProcess.getRemainingTime())); // may change later if
+                                                                                                  // there are errors
                         this.readyQueue.add(tempProcess);
                         break;
                     }
 
+                    // Process finished
                     if (tempProcess.getBurstTime() == 0) {
                         Process tempQueueProcess = this.readyQueue.peek();
 
@@ -277,6 +317,7 @@ public class AGScheduler extends Scheduler {
                                 break;
                             }
                         }
+                        tempProcess.setQuantum(0);
 
                         this.mDeadList.add(tempProcess);
                         this.mProcesses.remove(tempProcess);
