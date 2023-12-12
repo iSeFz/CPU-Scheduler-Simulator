@@ -67,6 +67,11 @@ public class ShortestJobScheduler extends Scheduler {
         List<Process> resultList = new ArrayList<Process>();
         processes.sort(new compareArrivedTime());
         while(resultList.size() != processes.size()){
+            if(ArrivedProcesses.isEmpty()){
+                ArrivedProcesses.add(processes.get(counter++));
+                if(currentTime < ArrivedProcesses.get(0).getArrivalTime())
+                    currentTime = ArrivedProcesses.get(0).getArrivalTime();
+            }
             for(;counter < processes.size() && processes.get(counter).getArrivalTime() <= currentTime;counter++){
                 ArrivedProcesses.add(processes.get(counter));
             }
