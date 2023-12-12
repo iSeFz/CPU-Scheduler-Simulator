@@ -3,7 +3,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SRTFScheduler extends Scheduler {
-
+    private double avgTurnaroundTime;
+    private double avgWaitingTime;
     private List<Process> processes;
 
 
