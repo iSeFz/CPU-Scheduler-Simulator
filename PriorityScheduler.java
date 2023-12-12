@@ -22,20 +22,7 @@ public class PriorityScheduler extends Scheduler {
 
     // Return the execution order of the processes
     @Override
-    public List<Process> executionOrder() {
-        // Custom comparator to compare between processes based on arrival time
-        Comparator<Process> atComparator = Comparator.comparingInt(process -> process.getArrivalTime());
-        // Custom comparator to compare between processes based on priority + current time
-        // In order to apply Aging solution to solve the starvation
-        // That means incrementing the priority of processes relative to the current time
-        Comparator<Process> priorityComparator = Comparator.comparingInt(process -> process.getPriority() + currentTime);
-        // Custom comparator to merge the two comparators
-        Comparator<Process> customComparator = atComparator.thenComparing(priorityComparator);
-        // Sort the list in ascending order based on custom comparator
-        Collections.sort(processes, customComparator);
-        // Return the sorted list
-        return processes;
-    }
+    public List<Process> executionOrder() { return this.processes; }
 
     // Return the waiting time of the processes
     @Override
@@ -63,52 +50,69 @@ public class PriorityScheduler extends Scheduler {
     @Override
     public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
 
-    // Search for the suitable next process to execute based on the arrival time
-    public Process findNextProcess() {
-        for (Process process : processes)
-            if (process.getArrivalTime() <= currentTime)
-                return process;
-        return null;
+    // Sort the list in ascending order based on priority number
+    public void sortByPriority(List<Process> arrivedProcesses) {
+        // Custom comparator to compare between processes based on priority + current time
+        // In order to apply Aging solution to solve the starvation
+        // That means incrementing the priority of processes relative to the current time
+        Comparator<Process> priorityComparator = Comparator.comparingInt(process -> process.getPriority() + currentTime);
+        Collections.sort(arrivedProcesses, priorityComparator);
     }
 
     // Main function to run the scheduler
     @Override
     public void startScheduler() {
-        // Temporary list to save the resulted process execution order
-        List<Process> resultList = new ArrayList<Process>();
+        // Temporary list to save the final process execution order
+        List<Process> executionOrderList = new ArrayList<Process>();
+        // Temporary list to save the arrived processes
+        List<Process> readyQueue = new ArrayList<Process>();
+        // Save the size of the original processes list
+        int nProcesses = processes.size();
+        // Sort the list in ascending order based on arrival time
+        Collections.sort(processes, Comparator.comparingInt(process -> process.getArrivalTime()));
         // Apply Actual Scheduling Simulation
-        while (!processes.isEmpty()) {
+        while (executionOrderList.size() != nProcesses) {
+            // If there are no arrived processes at the current time
+            if (readyQueue.isEmpty()) {
+                // Add the first process in the processes list to the ready queue
+                readyQueue.add(processes.get(0));
+                // If the first process arrival time is greater than the current time
+                if (readyQueue.get(0).getArrivalTime() > currentTime)
+                    // Move the current time forward to the first process arrival time
+                    currentTime = readyQueue.get(0).getArrivalTime();
+            }
+            // Continue adding processes to the ready queue based on the current time
+            for (Process process : processes)
+                // Check for duplicates before adding the process to the ready queue
+                if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process))
+                    readyQueue.add(process);
             // Sort processes after every process execution to maintain the order
             // Smallest number is the highest priority
-            processes = executionOrder();
+            sortByPriority(readyQueue);
             // Store the highest priority process based on the arrival time & priority
-            Process currentProcess = findNextProcess();
-            // Check for the returned value to continue scheduling
-            if (currentProcess != null) {
-                // Set the process waiting time relative to its arrival time
-                currentProcess.setWaitingTime(currentTime - currentProcess.getArrivalTime());
-                // Increment the time by the burst time of the current running process
-                currentTime += currentProcess.getBurstTime();
-                // Set the completion time of the current process by the current time
-                currentProcess.setCompletionTime(currentTime);
-                // Set the process turnaround time relative to its arrival time
-                currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
-                // Increment the average waiting time by the current process waiting time
-                avgWaitingTime += currentProcess.getWaitingTime();
-                // Increment the average turnaround time by the current process turnaround time
-                avgTurnaroundTime += currentProcess.getTurnAroundTime();
-                // Add the process to the result list
-                resultList.add(currentProcess);
-                // Remove process from the list as it has been executed
-                processes.remove(currentProcess);
-                // Increment the current time with the context switching time
-                currentTime += contextSwitchingTime;
-            }
-            else // No process with higher priority available, move time forward
-                currentTime++;
+            Process currentProcess = readyQueue.get(0);
+            // Set the process waiting time relative to its arrival time
+            currentProcess.setWaitingTime(currentTime - currentProcess.getArrivalTime());
+            // Increment the time by the burst time of the current running process
+            currentTime += currentProcess.getBurstTime();
+            // Set the completion time of the current process by the current time
+            currentProcess.setCompletionTime(currentTime);
+            // Set the process turnaround time relative to its arrival time
+            currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
+            // Increment the average waiting time by the current process waiting time
+            avgWaitingTime += currentProcess.getWaitingTime();
+            // Increment the average turnaround time by the current process turnaround time
+            avgTurnaroundTime += currentProcess.getTurnAroundTime();
+            // Add the process to the execution order list
+            executionOrderList.add(currentProcess);
+            // Remove process from the ready queue & the original list as it has been executed
+            readyQueue.remove(currentProcess);
+            processes.remove(currentProcess);
+            // Increment the current time with the context switching time
+            currentTime += contextSwitchingTime;
         }
-        // Save the result list back into the processes list
-        processes = resultList;
+        // Save the execution order list back into the processes list
+        processes = executionOrderList;
         // Calculate the average waiting & turnaround times
         avgWaitingTime /= processes.size();
         avgTurnaroundTime /= processes.size();
