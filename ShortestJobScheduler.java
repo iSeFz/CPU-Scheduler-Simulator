@@ -25,7 +25,7 @@ public class ShortestJobScheduler extends Scheduler {
     private double avgTurnaroundTime;
     private final int contextTime;
 
-    ShortestJobScheduler(List<Process> list, int c) {
+    public ShortestJobScheduler(List<Process> list, int c) {
         processes = list;
         avgTurnaroundTime = 0;
         avgWaitingTime = 0;
@@ -88,7 +88,7 @@ public class ShortestJobScheduler extends Scheduler {
             resultList.get(resultList.size()-1).setCompletionTime(currentTime);
             resultList.get(resultList.size()-1).setTurnAroundTime(currentTime - resultList.get(resultList.size()-1).getArrivalTime());
             avgTurnaroundTime += currentTime - resultList.get(resultList.size()-1).getArrivalTime();
-            ArrivedProcesses.removeFirst();
+            ArrivedProcesses.remove(ArrivedProcesses.get(0));
             currentTime += contextTime;
         }
         processes = resultList;
