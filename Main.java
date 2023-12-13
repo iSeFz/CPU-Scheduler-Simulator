@@ -35,6 +35,7 @@ public class Main {
 
             // Create the process object with the entered data
             Process newProcess = new Process(pName, pArrivalTime, pBurstTime);
+            newProcess.setRemainingTime(pBurstTime);
             newProcess.setQuantum(quantumTime);
             newProcess.setPriority(pPriorityNumber);
             processList.add(newProcess);
@@ -67,7 +68,7 @@ public class Main {
         scanner.close();
         System.out.println("\tThanks for using our CPU Scheduler Simulator!");
 
-        /* // For Fast Testing
+        /* // Priority Test Case
         Process p1 = new Process("P1", 0, 4);
         p1.setPriority(3);
         Process p2 = new Process("P2", 2, 1);
@@ -88,5 +89,28 @@ public class Main {
         // Create a scheduler for the processes
         PriorityScheduler priority = new PriorityScheduler(processes, 2);
         priority.startScheduler(); */
+
+        /* // AG Test Case
+        Process p1 = new Process("P1", 0, 17);
+        p1.setPriority(4);
+        p1.setQuantum(4);
+        Process p2 = new Process("P2", 3, 6);
+        p2.setPriority(9);
+        p2.setQuantum(4);
+        Process p3 = new Process("P3", 4, 10);
+        p3.setPriority(3);
+        p3.setQuantum(4);
+        Process p4 = new Process("P4", 29, 4);
+        p4.setPriority(8);
+        p4.setQuantum(4);
+        // Add the processes to the list
+        ArrayList<Process> processes = new ArrayList<>();
+        processes.add(p1);
+        processes.add(p2);
+        processes.add(p3);
+        processes.add(p4);
+        // Create a scheduler for the processes
+        AGScheduler ag = new AGScheduler(processes, 0);
+        ag.startScheduler(); */
     }
 }
