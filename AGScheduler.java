@@ -21,6 +21,7 @@ public class AGScheduler extends Scheduler {
     int TotalWaitingTime;
     int ContextSwitching;
 
+    // Default constructor
     public AGScheduler() {
         this.Input = new Scanner(System.in);
         this.NumOfProcesses = 0;
@@ -36,35 +37,24 @@ public class AGScheduler extends Scheduler {
         this.TotalWaitingTime = 0;
     }
 
+    // Parameterized constructor
     public AGScheduler(ArrayList<Process> processList, int ContextSwitching) {
-        this.mTemp = new ArrayList<>();
-        this.mOutput = new ArrayList<>();
-        this.mDeadList = new ArrayList<>();
-        this.readyQueue = new LinkedList<>();
-        this.mProcesses = new ArrayList<>();
-
+        this(); // Calling the default constructor to set the default values
+        this.mProcesses = processList;
+        this.NumOfProcesses = mProcesses.size();
         this.ContextSwitching = ContextSwitching;
-        int i = 0;
-        for (Process process : processList) {
-            process.setTempQuantum(process.getQuantum());
-            process.setRemainingTime(process.getBurstTime());
-            process.setWaitingTime(TimeLine - process.getArrivalTime());
-            this.MaxTime = process.getBurstTime();
 
+        for (Process process : mProcesses) {
+            // Calculate & set the process AG factor
+            calculateAGFactor(process);
+            // Set the process temp quantum
+            process.setTempQuantum(process.getQuantum());
+
+            this.MaxTime = process.getBurstTime();
             if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
                 this.MaxTime = process.getBurstTime() + process.getArrivalTime();
-
-            // calculate AG factor
-            int AGFactor = calculate_AG_Factor(process);
-            // setting AG factor
-            process.setAGFactor(AGFactor);
-
-            this.mProcesses.add(process);
             // this.mTemp.add(process);
-            i++;
-
         }
-        this.NumOfProcesses = processList.size();
     }
 
     @Override
@@ -120,54 +110,22 @@ public class AGScheduler extends Scheduler {
         }
     }
 
-    public int generateRandomNumber() {
-        Random random = new Random();
-
+    // Calculate & set the AG Factor for a certain process
+    void calculateAGFactor(Process P) {
+        int agFactor;
         // Generate a random number between 0 (inclusive) and 21 (exclusive)
+        Random random = new Random();
         int randomNumber = random.nextInt(21);
-
-        return randomNumber;
+        // Compute the formula based on the assignment sheet
+        if (randomNumber < 10)
+            agFactor = randomNumber + P.getArrivalTime() + P.getBurstTime();
+        else if (randomNumber > 10)
+            agFactor = 10 + P.getArrivalTime() + P.getBurstTime();
+        else
+            agFactor = P.getPriority() + P.getArrivalTime() + P.getBurstTime();
+        // Set the process ag factor after computing it via the formula
+        P.setAGFactor(agFactor);
     }
-
-    int calculate_AG_Factor(Process P) {
-        int rand = generateRandomNumber();
-
-        if (rand < 10) {
-            return rand + P.getArrivalTime() + P.getBurstTime();
-        } else if (rand > 10) {
-            return 10 + P.getArrivalTime() + P.getBurstTime();
-        } else {
-            return P.getPriority() + P.getArrivalTime() + P.getBurstTime();
-        }
-
-    }
-
-    // get user input return <list>process
-
-    // should be done after taking input after regular input from user
-    // public void getInput(List<Process> processes) {
-    // System.out.println("Enter quantum Time of process : ");
-    // int processQT = this.Input.nextInt();
-
-    // for (Process process : processes) {
-    // process.setQuantum(processQT);
-    // process.setTempQuantum(processQT);
-    // process.setRemainingTime(process.getBurstTime());
-    // this.MaxTime = process.getBurstTime();
-
-    // if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
-    // this.MaxTime = process.getBurstTime() + process.getArrivalTime();
-
-    // // calculate AG factor
-    // int AGFactor = calculate_AG_Factor(process);
-    // // setting AG factor
-    // process.setAGFactor(AGFactor);
-
-    // this.mProcesses.add(process);
-    // // this.mTemp.add(process);
-
-    // }
-    // }
 
     // Print [Time ] -> Quantum ( )
     public void printUpdates(int time) {
