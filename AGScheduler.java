@@ -1,21 +1,16 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class AGScheduler extends Scheduler {
-    Scanner Input;
+    //Scanner Input;
     int NumOfProcesses;
     ArrayList<Process> mProcesses;
     ArrayList<Process> mTemp;
     ArrayList<Process> mOutput;
     ArrayList<Process> mDeadList;
     // ArrayList<Integer> mTimeLine;
-    Queue<Process> readyQueue;
-    int TimeLine;
-    int MaxTime;
+    ArrayList<Process> readyQueue;
+    //int TimeLine; //
+    //int MaxTime;
     int TotalQuantum;
     int TotalTurnAround;
     int TotalWaitingTime;
@@ -23,15 +18,15 @@ public class AGScheduler extends Scheduler {
 
     // Default constructor
     public AGScheduler() {
-        this.Input = new Scanner(System.in);
+        //this.Input = new Scanner(System.in);
         this.NumOfProcesses = 0;
         this.mProcesses = new ArrayList<>();
-        this.TimeLine = 0;
+        //this.TimeLine = 0;
         this.mTemp = new ArrayList<>();
         this.mOutput = new ArrayList<>();
         this.mDeadList = new ArrayList<>();
-        this.readyQueue = new LinkedList<>();
-        this.MaxTime = 0;
+        this.readyQueue = new ArrayList<>();
+        //this.MaxTime = 0;
         this.TotalQuantum = 0;
         this.TotalTurnAround = 0;
         this.TotalWaitingTime = 0;
@@ -46,14 +41,14 @@ public class AGScheduler extends Scheduler {
 
         for (Process process : mProcesses) {
             // Calculate & set the process AG factor
-            calculateAGFactor(process);
+            //calculateAGFactor(process);
             // Set the process temp quantum
             process.setTempQuantum(process.getQuantum());
+            process.setRemainingTime(process.getBurstTime());
 
-            this.MaxTime = process.getBurstTime();
+            /*this.MaxTime = process.getBurstTime();
             if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
-                this.MaxTime = process.getBurstTime() + process.getArrivalTime();
-            // this.mTemp.add(process);
+                this.MaxTime = process.getBurstTime() + process.getArrivalTime();*/
         }
     }
 
@@ -129,13 +124,30 @@ public class AGScheduler extends Scheduler {
 
     // Print [Time ] -> Quantum ( )
     public void printUpdates(int time) {
+        ArrayList<Process> tempProcesses = this.mProcesses;
+        ArrayList<Process> tempDead = this.mDeadList;
+        ArrayList<Process> finalresult = new ArrayList<>();
+
+        for (int i = 0; i < tempProcesses.size(); i++) {
+            finalresult.add(tempProcesses.get(i));
+        }
+
+        for (int i = 0; i < tempDead.size(); i++) {
+            finalresult.add(tempDead.get(i));
+        }
+
+        finalresult.sort(Comparator.comparing(Process::getName));
+
         System.out.print("[Time: " + time + "] -> ");
         System.out.print("Quantum ( ");
-        for (int i = 0; i < this.mProcesses.size(); i++)
-            System.out.print(this.mProcesses.get(i).getQuantum() + " ");
+
+        for (int i = 0; i < finalresult.size(); i++)
+            System.out.print(finalresult.get(i).getQuantum() + " ");
+
         System.out.print(") -> ceil(50%) = ( ");
-        for (int i = 0; i < this.mProcesses.size(); i++)
-            System.out.print((int) Math.ceil((this.mProcesses.get(i).getQuantum()) * 0.5) + " ");
+
+        for (int i = 0; i < finalresult.size(); i++)
+            System.out.print((int) Math.ceil((finalresult.get(i).getQuantum()) * 0.5) + " ");
         System.out.println(")		");
     }
 
@@ -158,132 +170,190 @@ public class AGScheduler extends Scheduler {
         boolean x = true;
         while (x) {
             for (int i = 0; i < this.mProcesses.size(); i++) {
-                if (this.readyQueue.peek().getAGFactor() == this.mProcesses.get(i).getAGFactor())
+                if (this.readyQueue.get(0).getAGFactor() == this.mProcesses.get(i).getAGFactor())
                     x = false;
             }
 
             if (x)
-                this.readyQueue.remove();
+                this.readyQueue.remove(0);
         }
     }
 
+    public int calcMean() {
+        int sum = 0;
+        int numberOfProcesses = this.NumOfProcesses;
+        // loop over all processes in the mProcesses
+        for (Process p : mProcesses) {
+            // loop over all processes in the current time
+            sum += p.getQuantum();
+        }
+        double tmp = 0.1 * (sum / (double) numberOfProcesses);
+        return (int) Math.ceil(tmp);
+    }
+
+
     @Override
     public void startScheduler() {
-        // Process process = mProcesses.get(0);
-        int lastProcessAGFactor = 0;
-        // int quantum = process.getQuantum();
-        // boolean addedInTimeLine = false;
+        int time = 0; // current time flow
         int indexOfProcess = 0;
+        int lastProcessAGFactor = 0;
+        String name = ""; // name to get the process from ready queue or smallest AG
+        boolean finished = false;
 
-        for (int time = 0; time < this.MaxTime; time++) {
-            // TimeLine++;
+        while (this.mProcesses.size() != 0) {
+            sortProcesses(time); // sort processes based on arrivel time and AG factor
 
-            sortProcesses(time);
-            printUpdates(time);
+            if (!name.equals("")) { // to get the index of the process name
+                for (int i = 0; i < this.mProcesses.size(); i++) {
+                    if (this.mProcesses.get(i).getName().equals(name)) {
+                        indexOfProcess = i;
+                        break;
+                    }
+                }
+            }
+            name = ""; // to reset the name
 
             // Non-Preemptive
-            if (mProcesses.size() != 0 && this.mProcesses.get(indexOfProcess).getArrivalTime() <= time) {
-                Process tempProcess = new Process(this.mProcesses.get(indexOfProcess).getName(),
-                        this.mProcesses.get(indexOfProcess).getArrivalTime(),
-                        this.mProcesses.get(indexOfProcess).getBurstTime());
-
-                tempProcess.setPriority(this.mProcesses.get(indexOfProcess).getPriority());
-                tempProcess.setAGFactor(this.mProcesses.get(indexOfProcess).getAGFactor());
-                tempProcess.setRemainingTime(this.mProcesses.get(indexOfProcess).getRemainingTime());
-                tempProcess.setTurnAroundTime(this.mProcesses.get(indexOfProcess).getTurnAroundTime());
-                tempProcess.setWaitingTime(this.mProcesses.get(indexOfProcess).getWaitingTime());
-                tempProcess.setTempQuantum(this.mProcesses.get(indexOfProcess).getTempQuantum() - 1);
+            if (this.mProcesses.get(indexOfProcess).getArrivalTime() <= time) {
+                Process tempProcess = this.mProcesses.get(indexOfProcess);
+                tempProcess.setTempQuantum(this.mProcesses.get(indexOfProcess).getTempQuantum());
+                int tempQT = tempProcess.getQuantum();
 
                 System.out.print("Process " + tempProcess.getName() + " is running.");
 
                 if (lastProcessAGFactor != tempProcess.getAGFactor()) {
                     this.mOutput.add(tempProcess);
                     lastProcessAGFactor = tempProcess.getAGFactor();
-                    // this.mTimeLine.add(time);
                 }
 
-                // Updating the waiting time and the remaining time of the current process,
-                time += Math.min(tempProcess.getRemainingTime(), (int) Math.ceil(tempProcess.getQuantum() * 0.5));
-                tempProcess.setRemainingTime(tempProcess.getRemainingTime()
-                        - Math.min((int) Math.ceil(tempProcess.getQuantum() * 0.5), tempProcess.getRemainingTime()));
+
+                int fHalfQT = (int) Math.ceil(tempQT  * 0.5); // first half of quantem
+                int remainingHalfQT = (int) (tempQT - fHalfQT); // second half of quantem
+
+                // finish the first half of the quantum
+                while (tempProcess.getBurstTime() > 0 && fHalfQT != 0) {
+                    tempProcess.setBurstTime(tempProcess.getBurstTime() - 1);
+                    fHalfQT--;
+                    time++;
+                }
+
 
                 // Preemptive
-                int remainingHalfQT = (int) Math.floor(tempProcess.getQuantum() * 0.5);
-                for (int i = 0; i < remainingHalfQT; i++) {
+                while (tempProcess.getBurstTime() >= 0 && remainingHalfQT >= 0) {
                     int index = 0;
                     boolean flag = false;
+                    Process nextProcess = null;
 
+
+                    // to check if any process with smaller AG factor in current time
                     for (index = 0; index < this.mProcesses.size(); index++) {
-                        if (this.mProcesses.get(index).getAGFactor() < tempProcess.getAGFactor()
-                                && this.mProcesses.get(index).getArrivalTime() <= time) {
-                            flag = true;
-                            break;
-                        }
-                    }
-
-                    if (flag) { // there is a process with smaller AG Factor
-                        tempProcess.setQuantum(tempProcess.getRemainingTime() + tempProcess.getQuantum());
-                        tempProcess.setBurstTime(tempProcess.getBurstTime()
-                                - (tempProcess.getBurstTime() - tempProcess.getRemainingTime()));
-                        this.readyQueue.add(tempProcess);
-                        indexOfProcess = index;
-                        break; // may have update later for exiting the temp process
-                    } else { // there isn't a process with smaller AG Factor
-                        Process nextProcess = new Process(this.mProcesses.get(index).getName(),
-                                this.mProcesses.get(index).getArrivalTime(),
-                                this.mProcesses.get(index).getBurstTime());
-
-                        nextProcess.setPriority(this.mProcesses.get(index).getPriority());
-                        nextProcess.setAGFactor(this.mProcesses.get(index).getAGFactor());
-                        nextProcess.setRemainingTime(this.mProcesses.get(index).getRemainingTime());
-                        nextProcess.setTurnAroundTime(this.mProcesses.get(index).getTurnAroundTime());
-                        nextProcess.setWaitingTime(this.mProcesses.get(index).getWaitingTime());
-
-                        int mean = ((int) Math.ceil((this.TotalQuantum / this.NumOfProcesses) * 0.1));
-                        tempProcess.setQuantum(tempProcess.getQuantum() + mean);
-
-                        this.readyQueue.add(nextProcess);
-                    }
-
-                    // Process Quantum is done but there is still some progress to do
-                    if (tempProcess.getTempQuantum() == 0 && tempProcess.getBurstTime() != 0) {
-                        Process tempQueueProcess = this.readyQueue.peek();
-
-                        for (int j = 0; j < this.mProcesses.size(); j++) {
-                            if (this.mProcesses.get(j).getName().equals(tempQueueProcess.getName())) {
-                                indexOfProcess = j;
+                        if (this.mProcesses.get(index).getArrivalTime() <= time) {
+                            nextProcess = this.mProcesses.get(index);
+                            if (this.mProcesses.get(index).getAGFactor() < tempProcess.getAGFactor()) {
+                                flag = true;
                                 break;
                             }
                         }
+                    }
 
-                        int mean = ((int) Math.ceil((this.TotalQuantum / this.NumOfProcesses) * 0.1));
-                        tempProcess.setQuantum(tempProcess.getQuantum() + mean);
-                        tempProcess.setBurstTime(tempProcess.getBurstTime()
-                                - (tempProcess.getBurstTime() - tempProcess.getRemainingTime())); // may change later if
-                                                                                                  // there are errors
-                        this.readyQueue.add(tempProcess);
+
+                    if (flag) { // there is a process with smaller AG Factor
+                        tempProcess.setQuantum(remainingHalfQT + tempProcess.getQuantum());
+
+                        if (nextProcess != null && !(nextProcess.getName().equals(tempProcess.getName()))) {
+                            boolean in = false; // flag to check if there is a process in ready queue with the same name of temp process
+                            for (int j = 0; j < this.readyQueue.size(); j++) {
+                                if (this.readyQueue.get(j).getName().equals(tempProcess.getName())) {
+                                    in = true;
+                                    break;
+                                }
+                            }
+                            if (!in) {
+                                name = nextProcess.getName();
+                                this.readyQueue.add(tempProcess);
+                            }
+                        }
+                        break;
+                    }
+                    else { // there isn't a process with smaller AG Factor
+                        if (nextProcess != null && !(nextProcess.getName().equals(tempProcess.getName()))) {
+                            boolean in = false;
+                            for (int j = 0; j < this.readyQueue.size(); j++) {
+                                if (this.readyQueue.get(j).getName().equals(nextProcess.getName())) {
+                                    in = true;
+                                    break;
+                                }
+                            }
+                            if (!in) {
+                                this.readyQueue.add(nextProcess);
+                            }
+                        }
+                    }
+
+                    // Process Quantum is done but there is still some progress to do
+                    if (remainingHalfQT == 0 && tempProcess.getBurstTime() != 0) {
+                        Process tempQueueProcess = this.readyQueue.get(0); // get the first process in the ready queue
+                        name = tempQueueProcess.getName();
+
+                        int mean = calcMean();
+                        tempProcess.setQuantum(tempProcess.getQuantum() + mean); // Add 10% of the mean of quantum to the quantum
+
+                        boolean in = false;
+                        for (int j = 0; j < this.readyQueue.size(); j++) {
+                            if (this.readyQueue.get(j).getName().equals(tempProcess.getName())) {
+                                in = true;
+                                break;
+                            }
+                        }
+                        if (!in)
+                            this.readyQueue.add(tempProcess);
+
+                        this.readyQueue.remove(0); // remove first element of the queue
                         break;
                     }
 
                     // Process finished
                     if (tempProcess.getBurstTime() == 0) {
-                        Process tempQueueProcess = this.readyQueue.peek();
+                        if (this.mProcesses.size() == 0 && this.readyQueue.size() == 0) {
+                            finished = true;
+                            break;
+                        }
 
-                        for (int j = 0; j < this.mProcesses.size(); j++) {
-                            if (this.mProcesses.get(j).getName().equals(tempQueueProcess.getName())) {
-                                indexOfProcess = j;
+                        while (this.readyQueue.size() > 0) {
+                            Process firstProcess = this.readyQueue.get(0);
+                            if (firstProcess.getBurstTime() == 0) {
+                                this.readyQueue.remove(0);
+                            }
+                            else {
                                 break;
                             }
                         }
-                        tempProcess.setQuantum(0);
-
-                        this.mDeadList.add(tempProcess);
-                        this.mProcesses.remove(tempProcess);
-                        break;
+                        // Check if the queue is not empty before accessing elements
+                        if (!this.readyQueue.isEmpty()) {
+                            Process tempQueueProcess = this.readyQueue.get(0);
+                            name = tempQueueProcess.getName();
+                            tempProcess.setQuantum(0);
+                            this.mDeadList.add(tempProcess);
+                            this.mProcesses.remove(tempProcess);
+                            this.readyQueue.remove(0);
+                            break;
+                        } else {// Check if the queue is empty before accessing elements
+                            tempProcess.setQuantum(0);
+                            this.mDeadList.add(tempProcess);
+                            this.mProcesses.remove(tempProcess);
+                            break;
+                        }
                     }
+                    remainingHalfQT--; // decrease the remaining second half quantum
+                    time++; // increase the flow of time
+                    tempProcess.setBurstTime(tempProcess.getBurstTime() - 1); // decrease burst time with one
+
                 }
+                if (finished) // if the mProcesses is empty and ready queue is empty
+                    break;
+                else
+                    printUpdates(time); // print the processes updates
             }
         }
     }
-
 }
