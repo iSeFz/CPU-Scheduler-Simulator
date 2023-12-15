@@ -1,23 +1,26 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 // Scheduler for Non-Preemptive Priority Scheduling
 public class PriorityScheduler extends Scheduler {
     private List<Process> processes;
-    private int contextSwitchingTime;
     private int currentTime;
     private double avgWaitingTime;
     private double avgTurnaroundTime;
 
-    // Constructor to initialize the scheduler with a list of processes
-    public PriorityScheduler(List<Process> processes, int contextSwitchingTime) {
-        this.processes = processes;
-        this.contextSwitchingTime = contextSwitchingTime;
+    // Default constructor
+    public PriorityScheduler() {
+        this.processes = new ArrayList<Process>();
         this.currentTime = 0;
         this.avgWaitingTime = 0;
         this.avgTurnaroundTime = 0;
+    }
+
+    // Constructor to initialize the scheduler with a list of processes
+    public PriorityScheduler(List<Process> processes) {
+        this(); // Calling Default Constructor To Initialize Default Values
+        this.processes = processes;
     }
 
     // Return the execution order of the processes
@@ -50,15 +53,6 @@ public class PriorityScheduler extends Scheduler {
     @Override
     public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
 
-    // Sort the list in ascending order based on priority number
-    public void sortByPriority(List<Process> arrivedProcesses) {
-        // Custom comparator to compare between processes based on priority + current time
-        // In order to apply Aging solution to solve the starvation
-        // That means incrementing the priority of processes relative to the current time
-        Comparator<Process> priorityComparator = Comparator.comparingInt(process -> process.getPriority() + currentTime);
-        Collections.sort(arrivedProcesses, priorityComparator);
-    }
-
     // Main function to run the scheduler
     @Override
     public void startScheduler() {
@@ -69,7 +63,7 @@ public class PriorityScheduler extends Scheduler {
         // Save the size of the original processes list
         int nProcesses = processes.size();
         // Sort the list in ascending order based on arrival time
-        Collections.sort(processes, Comparator.comparingInt(process -> process.getArrivalTime()));
+        processes.sort(Comparator.comparingInt(process -> process.getArrivalTime()));
         // Apply Actual Scheduling Simulation
         while (executionOrderList.size() != nProcesses) {
             // If there are no arrived processes at the current time
@@ -87,18 +81,18 @@ public class PriorityScheduler extends Scheduler {
                 if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process))
                     readyQueue.add(process);
             // Sort processes after every process execution to maintain the order
-            // Smallest number is the highest priority
-            sortByPriority(readyQueue);
+            // The list is sorted in ascending order based on priority number, smallest number is the highest priority
+            readyQueue.sort(Comparator.comparingInt(process -> process.getPriority()));
             // Store the highest priority process based on the arrival time & priority
             Process currentProcess = readyQueue.get(0);
-            // Set the process waiting time relative to its arrival time
-            currentProcess.setWaitingTime(currentTime - currentProcess.getArrivalTime());
             // Increment the time by the burst time of the current running process
             currentTime += currentProcess.getBurstTime();
             // Set the completion time of the current process by the current time
             currentProcess.setCompletionTime(currentTime);
             // Set the process turnaround time relative to its arrival time
             currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
+            // Set the process waiting time relative to its burst time
+            currentProcess.setWaitingTime(currentProcess.getTurnAroundTime() - currentProcess.getBurstTime());
             // Increment the average waiting time by the current process waiting time
             avgWaitingTime += currentProcess.getWaitingTime();
             // Increment the average turnaround time by the current process turnaround time
@@ -108,8 +102,6 @@ public class PriorityScheduler extends Scheduler {
             // Remove process from the ready queue & the original list as it has been executed
             readyQueue.remove(currentProcess);
             processes.remove(currentProcess);
-            // Increment the current time with the context switching time
-            currentTime += contextSwitchingTime;
         }
         // Save the execution order list back into the processes list
         processes = executionOrderList;
