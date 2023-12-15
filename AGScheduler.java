@@ -1,111 +1,71 @@
 import java.util.*;
 
 public class AGScheduler extends Scheduler {
-    //Scanner Input;
-    int NumOfProcesses;
-    ArrayList<Process> mProcesses;
-    ArrayList<Process> mTemp;
-    ArrayList<Process> mOutput;
-    ArrayList<Process> mDeadList;
-    // ArrayList<Integer> mTimeLine;
-    ArrayList<Process> readyQueue;
-    //int TimeLine; //
-    //int MaxTime;
-    int TotalQuantum;
-    int TotalTurnAround;
-    int TotalWaitingTime;
-    int ContextSwitching;
+    private List<Process> mProcesses;
+    private List<Process> mOutput;
+    private List<Process> mDeadList;
+    private List<Process> readyQueue;
+    private int NumOfProcesses;
+    private int avgTurnaroundTime;
+    private int avgWaitingTime;
 
     // Default constructor
     public AGScheduler() {
-        //this.Input = new Scanner(System.in);
-        this.NumOfProcesses = 0;
         this.mProcesses = new ArrayList<>();
-        //this.TimeLine = 0;
-        this.mTemp = new ArrayList<>();
         this.mOutput = new ArrayList<>();
         this.mDeadList = new ArrayList<>();
         this.readyQueue = new ArrayList<>();
-        //this.MaxTime = 0;
-        this.TotalQuantum = 0;
-        this.TotalTurnAround = 0;
-        this.TotalWaitingTime = 0;
+        this.NumOfProcesses = 0;
+        this.avgTurnaroundTime = 0;
+        this.avgWaitingTime = 0;
     }
 
     // Parameterized constructor
-    public AGScheduler(ArrayList<Process> processList, int ContextSwitching) {
+    public AGScheduler(List<Process> processList) {
         this(); // Calling the default constructor to set the default values
         this.mProcesses = processList;
         this.NumOfProcesses = mProcesses.size();
-        this.ContextSwitching = ContextSwitching;
 
         for (Process process : mProcesses) {
             // Calculate & set the process AG factor
-            //calculateAGFactor(process);
+            // calculateAGFactor(process);
             // Set the process temp quantum
             process.setTempQuantum(process.getQuantum());
-
-            /*this.MaxTime = process.getBurstTime();
-            if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
-                this.MaxTime = process.getBurstTime() + process.getArrivalTime();*/
         }
     }
 
+    // Return the execution order of the processes
     @Override
-    public List<Process> executionOrder() {
-        return mOutput;
-    }
+    public List<Process> executionOrder() { return mOutput; }
 
+    // Return the waiting time of the processes
     @Override
     public List<Integer> waitingTime() {
         List<Integer> waitingTimeList = new ArrayList<Integer>();
-        waitingtimeCalculations();
-        for (Process process : mProcesses) {
+        for (Process process : mOutput)
             waitingTimeList.add(process.getWaitingTime());
-        }
         return waitingTimeList;
     }
 
+    // Return the turnaround time of the processes
     @Override
     public List<Integer> turnaroundTime() {
-        List<Integer> turnAroundList = new ArrayList<Integer>();
-        turnAroundCalculations();
-        for (Process process : mProcesses) {
-            turnAroundList.add(process.getTurnAroundTime());
-        }
-        return turnAroundList;
+        List<Integer> turnaroundTimeList = new ArrayList<Integer>();
+        for (Process process : mOutput)
+            turnaroundTimeList.add(process.getTurnAroundTime());
+        return turnaroundTimeList;
     }
 
+    // Return the average waiting time of the processes
     @Override
-    public double avgWaitingTime() {
-        waitingtimeCalculations();
-        return this.TotalWaitingTime / this.NumOfProcesses;
-    }
+    public double avgWaitingTime() { return this.avgWaitingTime; }
 
+    // Return the average turnaround time of the processes
     @Override
-    public double avgTurnaroundTime() {
-        turnAroundCalculations();
-        return this.TotalTurnAround / this.NumOfProcesses;
-    }
-
-    public void turnAroundCalculations() {
-        for (int i = 0; i < this.mProcesses.size(); i++) {
-            this.mProcesses.get(i).setTurnAroundTime(
-                    this.mProcesses.get(i).getCompletionTime() - this.mProcesses.get(i).getArrivalTime());
-            this.TotalTurnAround += this.mProcesses.get(i).getTurnAroundTime();
-        }
-    }
-
-    public void waitingtimeCalculations() {
-        for (int i = 0; i < this.mProcesses.size(); i++) {
-            this.mProcesses.get(i).setWaitingTime(
-                    this.mProcesses.get(i).getTurnAroundTime() - this.mProcesses.get(i).getBurstTime());
-            this.TotalWaitingTime += this.mProcesses.get(i).getWaitingTime();
-        }
-    }
+    public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
 
     // Calculate & set the AG Factor for a certain process
-    void calculateAGFactor(Process P) {
+    private void calculateAGFactor(Process P) {
         int agFactor;
         // Generate a random number between 0 (inclusive) and 21 (exclusive)
         Random random = new Random();
@@ -121,11 +81,11 @@ public class AGScheduler extends Scheduler {
         P.setAGFactor(agFactor);
     }
 
-    // Print [Time ] -> Quantum ( )
-    public void printUpdates(int time) {
-        ArrayList<Process> tempProcesses = this.mProcesses;
-        ArrayList<Process> tempDead = this.mDeadList;
-        ArrayList<Process> finalresult = new ArrayList<>();
+    // Print [Time] => Quantum ()
+    private void printUpdates(int time) {
+        List<Process> tempProcesses = this.mProcesses;
+        List<Process> tempDead = this.mDeadList;
+        List<Process> finalresult = new ArrayList<>();
 
         for (int i = 0; i < tempProcesses.size(); i++) {
             finalresult.add(tempProcesses.get(i));
@@ -137,21 +97,20 @@ public class AGScheduler extends Scheduler {
 
         finalresult.sort(Comparator.comparing(Process::getName));
 
-        System.out.print("[Time: " + time + "] -> ");
-        System.out.print("Quantum ( ");
+        System.out.print("[Current Time: " + time + "] => Quantum ( ");
 
         for (int i = 0; i < finalresult.size(); i++)
             System.out.print(finalresult.get(i).getQuantum() + " ");
 
-        System.out.print(") -> ceil(50%) = ( ");
+        System.out.print(") => ceil(50%) ==> ( ");
 
         for (int i = 0; i < finalresult.size(); i++)
             System.out.print((int) Math.ceil((finalresult.get(i).getQuantum()) * 0.5) + " ");
-        System.out.println(")		");
+        System.out.println(")");
     }
 
     // Sorting Processes in List
-    public void sortProcesses(int time) {
+    private void sortProcesses(int time) {
         this.mProcesses.sort((o1, o2) -> {
             if (o1.getArrivalTime() <= time && o2.getArrivalTime() <= time) {
                 if (o1.getAGFactor() < o2.getAGFactor())
@@ -165,20 +124,7 @@ public class AGScheduler extends Scheduler {
         });
     }
 
-    public void isFinished() {
-        boolean x = true;
-        while (x) {
-            for (int i = 0; i < this.mProcesses.size(); i++) {
-                if (this.readyQueue.get(0).getAGFactor() == this.mProcesses.get(i).getAGFactor())
-                    x = false;
-            }
-
-            if (x)
-                this.readyQueue.remove(0);
-        }
-    }
-
-    public int calcMean() {
+    private int calcMean() {
         int sum = 0;
         int numberOfProcesses = this.NumOfProcesses;
         // loop over all processes in the mProcesses
@@ -190,7 +136,7 @@ public class AGScheduler extends Scheduler {
         return (int) Math.ceil(tmp);
     }
 
-
+    // Main function to run the scheduler
     @Override
     public void startScheduler() {
         int time = 0; // current time flow
@@ -218,13 +164,12 @@ public class AGScheduler extends Scheduler {
                 tempProcess.setTempQuantum(this.mProcesses.get(indexOfProcess).getTempQuantum());
                 int tempQT = tempProcess.getQuantum();
 
-                System.out.print("Process " + tempProcess.getName() + " is running.");
+                // System.out.print(tempProcess.getName() + " is running! ");
 
                 if (lastProcessAGFactor != tempProcess.getAGFactor()) {
                     this.mOutput.add(tempProcess);
                     lastProcessAGFactor = tempProcess.getAGFactor();
                 }
-
 
                 int fHalfQT = (int) Math.ceil(tempQT  * 0.5); // first half of quantem
                 int remainingHalfQT = (int) (tempQT - fHalfQT); // second half of quantem
@@ -234,6 +179,10 @@ public class AGScheduler extends Scheduler {
                     tempProcess.setBurstTime(tempProcess.getBurstTime() - 1);
                     fHalfQT--;
                     time++;
+                    // Check if the process is not the last process in the execution order list to prevent duplicates
+                    if (mOutput.isEmpty() || mOutput.get(mOutput.size() - 1) != tempProcess)
+                        // Add the process to the execution order list
+                        mOutput.add(tempProcess);
                 }
 
 
@@ -242,7 +191,6 @@ public class AGScheduler extends Scheduler {
                     int index = 0;
                     boolean flag = false;
                     Process nextProcess = null;
-
 
                     // to check if any process with smaller AG factor in current time
                     for (index = 0; index < this.mProcesses.size(); index++) {
@@ -254,7 +202,6 @@ public class AGScheduler extends Scheduler {
                             }
                         }
                     }
-
 
                     if (flag) { // there is a process with smaller AG Factor
                         tempProcess.setQuantum(remainingHalfQT + tempProcess.getQuantum());
@@ -313,6 +260,13 @@ public class AGScheduler extends Scheduler {
 
                     // Process finished
                     if (tempProcess.getBurstTime() == 0) {
+                        // Set process crucial data
+                        tempProcess.setCompletionTime(time);
+                        tempProcess.setTurnAroundTime(tempProcess.getCompletionTime() - tempProcess.getArrivalTime());
+                        tempProcess.setWaitingTime(tempProcess.getTurnAroundTime() - tempProcess.getRemainingTime());
+                        this.avgWaitingTime += tempProcess.getWaitingTime();
+                        this.avgTurnaroundTime += tempProcess.getTurnAroundTime();
+
                         if (this.mProcesses.size() == 0 && this.readyQueue.size() == 0) {
                             finished = true;
                             break;
@@ -346,13 +300,23 @@ public class AGScheduler extends Scheduler {
                     remainingHalfQT--; // decrease the remaining second half quantum
                     time++; // increase the flow of time
                     tempProcess.setBurstTime(tempProcess.getBurstTime() - 1); // decrease burst time with one
+                    // Check if the process is not the last process in the execution order list to prevent duplicates
+                    if (mOutput.isEmpty() || mOutput.get(mOutput.size() - 1) != tempProcess)
+                        // Add the process to the execution order list
+                        mOutput.add(tempProcess);
 
                 }
                 if (finished) // if the mProcesses is empty and ready queue is empty
                     break;
-                else
-                    printUpdates(time); // print the processes updates
+                // else printUpdates(time); // print the processes updates
             }
         }
+        // Calculate the average waiting & turnaround times
+        avgWaitingTime /= NumOfProcesses;
+        avgTurnaroundTime /= NumOfProcesses;
+        // Print the name of the scheduler
+        System.out.println("\t\tAG Scheduler");
+        // Call the main function of the abstract class
+        super.PrintOUTPUT();
     }
 }
