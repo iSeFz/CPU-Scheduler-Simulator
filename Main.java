@@ -54,9 +54,9 @@ public class Main {
             // ShortestJobScheduler SJF = new ShortestJobScheduler(processList, contextSwitchingTime);
             // SJF.startScheduler();
         } else if (choice == 2) {
-            System.out.println("\tComing Soon!");
-            // SRTFScheduler SRTF = new SRTFScheduler(processList);
-            // SRTF.startScheduler();
+            System.out.println("\tMaintenance in progress!");
+            SRTFScheduler SRTF = new SRTFScheduler(processList);
+             SRTF.startScheduler();
         } else if (choice == 3) {
             PriorityScheduler priority = new PriorityScheduler(processList, contextSwitchingTime);
             priority.startScheduler();
