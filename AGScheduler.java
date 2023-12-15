@@ -1,11 +1,13 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 
 public class AGScheduler extends Scheduler {
     private List<Process> mProcesses;
     private List<Process> mOutput;
     private List<Process> mDeadList;
     private List<Process> readyQueue;
-    private List<Process> tempPrint;
     private int NumOfProcesses;
     private double avgTurnaroundTime;
     private double avgWaitingTime;
@@ -16,7 +18,6 @@ public class AGScheduler extends Scheduler {
         this.mOutput = new ArrayList<>();
         this.mDeadList = new ArrayList<>();
         this.readyQueue = new ArrayList<>();
-        this.tempPrint = new ArrayList<>();
         this.NumOfProcesses = 0;
         this.avgTurnaroundTime = 0;
         this.avgWaitingTime = 0;
@@ -47,13 +48,12 @@ public class AGScheduler extends Scheduler {
     @Override
     public List<Integer> waitingTime() {
         List<Integer> waitingTimeList = new ArrayList<Integer>();
-        tempPrint = this.mDeadList;
-        tempPrint.sort(Comparator.comparing(Process::getName));
-
-        for (Process process : tempPrint)
+        // Sort the finished processes by name
+        mDeadList.sort(Comparator.comparing(Process::getName));
+        // Add the waiting time of each process to the list
+        for (Process process : mDeadList)
             waitingTimeList.add(process.getWaitingTime());
-
-        System.out.println("Note: Processes are sorted based on name ");
+        System.out.println("Note: Processes' waiting times are sorted alphabetically!");
         return waitingTimeList;
     }
 
@@ -61,11 +61,12 @@ public class AGScheduler extends Scheduler {
     @Override
     public List<Integer> turnaroundTime() {
         List<Integer> turnaroundTimeList = new ArrayList<Integer>();
-        tempPrint = this.mDeadList;
-        tempPrint.sort(Comparator.comparing(Process::getName));
-
-        for (Process process : tempPrint)
+        // Sort the finished processes by name
+        mDeadList.sort(Comparator.comparing(Process::getName));
+        // Add the waiting time of each process to the list
+        for (Process process : mDeadList)
             turnaroundTimeList.add(process.getTurnAroundTime());
+        System.out.println("Note: Processes' turnaround times are sorted alphabetically!");
         return turnaroundTimeList;
     }
 
@@ -332,11 +333,10 @@ public class AGScheduler extends Scheduler {
             }
         }
         // Calculate the average waiting & turnaround times
-        this.avgWaitingTime /= (double) this.NumOfProcesses;
-        this.avgTurnaroundTime /= (double) this.NumOfProcesses;
+        this.avgWaitingTime /= this.NumOfProcesses;
+        this.avgTurnaroundTime /= this.NumOfProcesses;
         // Print the name of the scheduler
-        System.out.println("\n");
-        System.out.println("\t\tAG Scheduler");
+        System.out.println("\n\n\t\tAG Scheduler");
         // Call the main function of the abstract class
         super.PrintOUTPUT();
     }
