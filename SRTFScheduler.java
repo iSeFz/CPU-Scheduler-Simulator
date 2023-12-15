@@ -1,6 +1,5 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 // Scheduler for Shortest Remaining Time First (SRTF)
@@ -9,13 +8,19 @@ public class SRTFScheduler extends Scheduler {
     private int currentTime;
     private double avgWaitingTime;
     private double avgTurnaroundTime;
+    
+    // Default constructor
+    public SRTFScheduler() {
+        this.processes = new ArrayList<Process>();
+        this.currentTime = 0;
+        this.avgTurnaroundTime = 0;
+        this.avgWaitingTime = 0;
+    }
 
     // Constructor to initialize the scheduler with a list of processes
     public SRTFScheduler(List<Process> processes) {
+        this(); // Calling default constructor to set default values
         this.processes = processes;
-        this.currentTime = 0;
-        this.avgWaitingTime = 0;
-        this.avgTurnaroundTime = 0;
     }
 
     // Return the execution order of the processes
@@ -48,78 +53,70 @@ public class SRTFScheduler extends Scheduler {
     @Override
     public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
 
-    // Sort the list in ascending order based on arrival time
-    public void sortByArrivalTime(List<Process> arrivedProcesses) {
-        Collections.sort(arrivedProcesses, Comparator.comparingInt(Process::getArrivalTime));
-    }
-
-    // Sort the ready queue in ascending order based on remaining time
-    public void sortByRemainingTime(List<Process> readyQueue) {
-        Collections.sort(readyQueue, Comparator.comparingInt(Process::getRemainingTime));
-    }
-
     // Main function to run the scheduler
     @Override
     public void startScheduler() {
         // List to store the final process execution order
-        List<Process> executionOrderList = new ArrayList<>();
-        // List to store the arrived processes ready for execution
-        List<Process> readyQueue = new ArrayList<>();
-        sortByArrivalTime(processes);
-        // Continue scheduling until all processes are executed
-        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
-            // Check for arrived processes and add them to the ready queue
-            if(readyQueue.isEmpty()){
+        List<Process> executionOrderList = new ArrayList<Process>();
+        // List to store the arrived processes
+        List<Process> readyQueue = new ArrayList<Process>();
+        // Save the size of the original processes list
+        int numOfProcesses = processes.size();
+        // Sort the list in ascending order based on arrival time
+        processes.sort(Comparator.comparingInt(process -> process.getArrivalTime()));
+        // Apply Actual Scheduling Simulation
+        while (!processes.isEmpty()) {
+            // If there are no arrived processes at the current time
+            if (readyQueue.isEmpty()) {
+                // Add the first process in the processes list to the ready queue
                 readyQueue.add(processes.get(0));
-                if(processes.get(0).getArrivalTime() > currentTime)
-                    currentTime = processes.get(0).getArrivalTime();
-                processes.remove(0);
+                // If the first process arrival time is greater than the current time
+                if (readyQueue.get(0).getArrivalTime() > currentTime)
+                    // Move the current time forward to the first process arrival time
+                    currentTime = readyQueue.get(0).getArrivalTime();
             }
-            while(!processes.isEmpty() && processes.get(0).getArrivalTime() <= currentTime){
-                readyQueue.add(processes.get(0));
-                processes.remove(0);
-            }
-
-            sortByRemainingTime(readyQueue);
-
+            // Continue adding processes to the ready queue based on the current time
+            for (Process process : processes)
+                // Check for duplicates before adding the process to the ready queue
+                if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process))
+                    readyQueue.add(process);
+            // Sort processes after every process execution to maintain the order of execution
+            readyQueue.sort(Comparator.comparingInt(process -> process.getRemainingTime()));
+            // Store the shortest remaining time process, it'll always be the first element
+            // As the list is sorted in ascending order based on the remaining time of the processes
             Process currentProcess = readyQueue.get(0);
-            readyQueue.remove(0);
-            while(currentProcess.getRemainingTime() != 0){
-                while(!processes.isEmpty() && processes.get(0).getArrivalTime() <= currentTime){
-                    readyQueue.add(processes.get(0));
-                    processes.remove(0);
-                }
-                sortByRemainingTime(readyQueue);
-                if(!readyQueue.isEmpty() && readyQueue.get(0).getRemainingTime() < currentProcess.getRemainingTime()){
-                    readyQueue.add(currentProcess);
-                    currentProcess = readyQueue.get(0);
-                    readyQueue.remove(0);
-                }
-                currentTime++;
-                currentProcess.setRemainingTime(currentProcess.getRemainingTime()-1);
+            // Decrement its remaining time by 1, meaning it has executed 1 time unit
+            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
+            currentTime++; // Move time forward by 1 second
+            // Check if the process is not the last process in the execution order list to prevent duplicates
+            if (executionOrderList.isEmpty() || executionOrderList.get(executionOrderList.size() - 1) != currentProcess)
+                // Add the process to the execution order list
+                executionOrderList.add(currentProcess);
+            // If the process finished its execution
+            if (currentProcess.getRemainingTime() == 0) {
+                // Remove process from the ready queue & the original list as it has been executed
+                readyQueue.remove(currentProcess);
+                processes.remove(currentProcess);
+                // Set the process completion time by the current time
+                currentProcess.setCompletionTime(currentTime);
+                // Set the process turnaround time relative to its arrival time
+                currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
+                // Set the process waiting time
+                currentProcess.setWaitingTime(currentProcess.getTurnAroundTime() - currentProcess.getBurstTime());
+                // Increment the average waiting time by the current process waiting time
+                avgWaitingTime += currentProcess.getWaitingTime();
+                // Increment the average turnaround time by the current process turnaround time
+                avgTurnaroundTime += currentProcess.getTurnAroundTime();
             }
-            // Update waiting time and remaining time for the current process
-            currentProcess.setWaitingTime(currentTime - (currentProcess.getArrivalTime() + currentProcess.getBurstTime()));
-//            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
-//            currentProcess.setRemainingTime(0);
-            // Increment the time by 1 second
-//            currentTime++;
-//            currentTime+= currentProcess.getBurstTime();
-            // Set completion time, turnaround time, and update averages
-            currentProcess.setCompletionTime(currentTime);
-            currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
-            avgWaitingTime += currentProcess.getWaitingTime();
-            avgTurnaroundTime += currentProcess.getTurnAroundTime();
-
-            // Remove the finished process from the ready queue and processes list
-//            readyQueue.remove(currentProcess);
-
-            // Add the process to the execution order list
-            executionOrderList.add(currentProcess);
         }
+        // Save the execution order list back into the processes list
         processes = executionOrderList;
-        // Print scheduler information
+        // Calculate the average waiting & turnaround times
+        avgWaitingTime /= numOfProcesses;
+        avgTurnaroundTime /= numOfProcesses;
+        // Print the name of the scheduler
         System.out.println("\t\tShortest Remaining Time First (SRTF) Scheduler");
+        // Call the main function of the abstract class
         super.PrintOUTPUT();
     }
 }
