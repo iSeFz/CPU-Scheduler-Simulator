@@ -9,12 +9,10 @@ public class SRTFScheduler extends Scheduler {
     private int currentTime;
     private double avgWaitingTime;
     private double avgTurnaroundTime;
-    private int contextTime;
 
     // Constructor to initialize the scheduler with a list of processes
-    public SRTFScheduler(List<Process> processes , int c) {
+    public SRTFScheduler(List<Process> processes) {
         this.processes = processes;
-        contextTime = c;
         this.currentTime = 0;
         this.avgWaitingTime = 0;
         this.avgTurnaroundTime = 0;
@@ -70,12 +68,6 @@ public class SRTFScheduler extends Scheduler {
         sortByArrivalTime(processes);
         // Continue scheduling until all processes are executed
         while (!processes.isEmpty() || !readyQueue.isEmpty()) {
-            // some prints just to trace the code
-//            System.out.println("Current Time: " + currentTime);
-//            System.out.println("Processes: " + processes);
-//            System.out.println("Ready Queue: " + readyQueue);
-//            System.out.println("Execution Order: " + executionOrderList);
-
             // Check for arrived processes and add them to the ready queue
             if(readyQueue.isEmpty()){
                 readyQueue.add(processes.get(0));
@@ -83,40 +75,44 @@ public class SRTFScheduler extends Scheduler {
                     currentTime = processes.get(0).getArrivalTime();
                 processes.remove(0);
             }
-//            for (Process process : processes) {
-//                if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process)) {
-//                    readyQueue.add(process);
-//                }
-//            }
             while(!processes.isEmpty() && processes.get(0).getArrivalTime() <= currentTime){
                 readyQueue.add(processes.get(0));
                 processes.remove(0);
             }
 
-            // Sort processes in the ready queue by arrival time
-//            sortByArrivalTime(readyQueue);
-            // Then sort by remaining time (in case of ties in arrival time)
             sortByRemainingTime(readyQueue);
 
-            // Get the process with the shortest remaining time in the readyQueue
             Process currentProcess = readyQueue.get(0);
-
+            readyQueue.remove(0);
+            while(currentProcess.getRemainingTime() != 0){
+                while(!processes.isEmpty() && processes.get(0).getArrivalTime() <= currentTime){
+                    readyQueue.add(processes.get(0));
+                    processes.remove(0);
+                }
+                sortByRemainingTime(readyQueue);
+                if(!readyQueue.isEmpty() && readyQueue.get(0).getRemainingTime() < currentProcess.getRemainingTime()){
+                    readyQueue.add(currentProcess);
+                    currentProcess = readyQueue.get(0);
+                    readyQueue.remove(0);
+                }
+                currentTime++;
+                currentProcess.setRemainingTime(currentProcess.getRemainingTime()-1);
+            }
             // Update waiting time and remaining time for the current process
-            currentProcess.setWaitingTime(currentTime - currentProcess.getArrivalTime());
+            currentProcess.setWaitingTime(currentTime - (currentProcess.getArrivalTime() + currentProcess.getBurstTime()));
 //            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
-            currentProcess.setRemainingTime(0);
+//            currentProcess.setRemainingTime(0);
             // Increment the time by 1 second
 //            currentTime++;
-            currentTime+= currentProcess.getBurstTime();
+//            currentTime+= currentProcess.getBurstTime();
             // Set completion time, turnaround time, and update averages
             currentProcess.setCompletionTime(currentTime);
             currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
             avgWaitingTime += currentProcess.getWaitingTime();
             avgTurnaroundTime += currentProcess.getTurnAroundTime();
-            currentTime+=contextTime;
 
             // Remove the finished process from the ready queue and processes list
-            readyQueue.remove(currentProcess);
+//            readyQueue.remove(currentProcess);
 
             // Add the process to the execution order list
             executionOrderList.add(currentProcess);
