@@ -58,14 +58,6 @@ public class SRTFScheduler extends Scheduler {
         Collections.sort(readyQueue, Comparator.comparingInt(Process::getRemainingTime));
     }
 
-
-    // Function to initialize remaining time for every process
-    private void initializeRemainingTime() {
-        for (Process process : processes) {
-            process.setRemainingTime(process.getBurstTime());
-        }
-    }
-
     // Main function to run the scheduler
     @Override
     public void startScheduler() {
@@ -73,11 +65,6 @@ public class SRTFScheduler extends Scheduler {
         List<Process> executionOrderList = new ArrayList<>();
         // List to store the arrived processes ready for execution
         List<Process> readyQueue = new ArrayList<>();
-        // Total number of processes to be scheduled
-        int nProcesses = processes.size();
-
-        // Initialize remaining time for every process
-        initializeRemainingTime();
 
         // Continue scheduling until all processes are executed
         while (!processes.isEmpty()) {
@@ -107,7 +94,7 @@ public class SRTFScheduler extends Scheduler {
             currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
 
             // Increment the time by 1 second
-            currentTime += 1;
+            currentTime++;
 
             // If the current process finishes its execution
             if (currentProcess.getRemainingTime() == 0) {
@@ -130,5 +117,4 @@ public class SRTFScheduler extends Scheduler {
         System.out.println("\t\tShortest Remaining Time First (SRTF) Scheduler");
         super.PrintOUTPUT();
     }
-
 }

@@ -44,7 +44,6 @@ public class AGScheduler extends Scheduler {
             //calculateAGFactor(process);
             // Set the process temp quantum
             process.setTempQuantum(process.getQuantum());
-            process.setRemainingTime(process.getBurstTime());
 
             /*this.MaxTime = process.getBurstTime();
             if (this.MaxTime < process.getBurstTime() + process.getArrivalTime())
