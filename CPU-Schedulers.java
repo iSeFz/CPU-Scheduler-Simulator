@@ -53,7 +53,8 @@ class Main {
         int choice = scanner.nextInt();
         if (choice == 1) {
             System.out.println("\tMaintenance in progress!");
-            ShortestJobScheduler SJF = new ShortestJobScheduler(processList, contextSwitchingTime);
+            ShortestJobScheduler SJF = new ShortestJobScheduler(processList,
+                    contextSwitchingTime);
             SJF.startScheduler();
         } else if (choice == 2) {
             System.out.println("\tMaintenance in progress!");
@@ -69,72 +70,77 @@ class Main {
         scanner.close();
         System.out.println("\tThanks for using our CPU Scheduler Simulator!");
 
-        /* // SRTF Test Case
-        Process p1 = new Process("P1", 0, 8);
-        Process p2 = new Process("P2", 1, 4);
-        Process p3 = new Process("P3", 2, 9);
-        Process p4 = new Process("P4", 3, 5);
-        // Add the processes to the list
-        List<Process> processes = new ArrayList<>();
-        processes.add(p1);
-        processes.add(p2);
-        processes.add(p3);
-        processes.add(p4);
-        // Create a scheduler for the processes
-        SRTFScheduler srtf = new SRTFScheduler(processes);
-        srtf.startScheduler(); */
-        
-        /* // Priority Test Case
-        Process p1 = new Process("P1", 0, 17);
-        p1.setPriority(4);
-        Process p2 = new Process("P2", 3, 6);
-        p2.setPriority(9);
-        Process p3 = new Process("P3", 4, 10);
-        p3.setPriority(2);
-        Process p4 = new Process("P4", 29, 4);
-        p4.setPriority(1);
-        // Add the processes to the list
-        ArrayList<Process> processes = new ArrayList<>();
-        processes.add(p1);
-        processes.add(p2);
-        processes.add(p3);
-        processes.add(p4);
-        // Create a scheduler for the processes
-        PriorityScheduler priority = new PriorityScheduler(processes);
-        priority.startScheduler(); */
+        /*
+         * // SRTF Test Case
+         * Process p1 = new Process("P1", 0, 8);
+         * Process p2 = new Process("P2", 1, 4);
+         * Process p3 = new Process("P3", 2, 9);
+         * Process p4 = new Process("P4", 3, 5);
+         * // Add the processes to the list
+         * List<Process> processes = new ArrayList<>();
+         * processes.add(p1);
+         * processes.add(p2);
+         * processes.add(p3);
+         * processes.add(p4);
+         * // Create a scheduler for the processes
+         * SRTFScheduler srtf = new SRTFScheduler(processes);
+         * srtf.startScheduler();
+         */
 
-        /* // AG Assignment Sheet Test Case
-        Process p1 = new Process("P1", 0, 17);
-        p1.setPriority(4);
-        p1.setQuantum(4);
-        p1.setAGFactor(20);
-        Process p2 = new Process("P2", 3, 6);
-        p2.setPriority(9);
-        p2.setQuantum(4);
-        p2.setAGFactor(17);
-        Process p3 = new Process("P3", 4, 10);
-        p3.setPriority(2);
-        p3.setQuantum(4);
-        p3.setAGFactor(16);
-        Process p4 = new Process("P4", 29, 4);
-        p4.setPriority(8);
-        p4.setQuantum(4);
-        p4.setAGFactor(43);
-        // Add the processes to the list
-        List<Process> processes = new ArrayList<>();
-        processes.add(p1);
-        processes.add(p2);
-        processes.add(p3);
-        processes.add(p4);
-        // Create a scheduler for the processes
-        AGScheduler ag = new AGScheduler(processes);
-        ag.startScheduler(); */
+        /*
+         * // Priority Test Case
+         * Process p1 = new Process("P1", 0, 17);
+         * p1.setPriority(4);
+         * Process p2 = new Process("P2", 3, 6);
+         * p2.setPriority(9);
+         * Process p3 = new Process("P3", 4, 10);
+         * p3.setPriority(2);
+         * Process p4 = new Process("P4", 29, 4);
+         * p4.setPriority(1);
+         * // Add the processes to the list
+         * ArrayList<Process> processes = new ArrayList<>();
+         * processes.add(p1);
+         * processes.add(p2);
+         * processes.add(p3);
+         * processes.add(p4);
+         * // Create a scheduler for the processes
+         * PriorityScheduler priority = new PriorityScheduler(processes);
+         * priority.startScheduler();
+         */
+
+        // AG Assignment Sheet Test Case
+        // Process p1 = new Process("P1", 0, 17);
+        // p1.setPriority(4);
+        // p1.setQuantum(4);
+        // p1.setAGFactor(20);
+        // Process p2 = new Process("P2", 3, 6);
+        // p2.setPriority(9);
+        // p2.setQuantum(4);
+        // p2.setAGFactor(17);
+        // Process p3 = new Process("P3", 4, 10);
+        // p3.setPriority(2);
+        // p3.setQuantum(4);
+        // p3.setAGFactor(16);
+        // Process p4 = new Process("P4", 29, 4);
+        // p4.setPriority(8);
+        // p4.setQuantum(4);
+        // p4.setAGFactor(43);
+        // // Add the processes to the list
+        // List<Process> processes = new ArrayList<>();
+        // processes.add(p1);
+        // processes.add(p2);
+        // processes.add(p3);
+        // processes.add(p4);
+        // // Create a scheduler for the processes
+        // AGScheduler ag = new AGScheduler(processes);
+        // ag.startScheduler();
+
     }
 }
 
-// Process Class To Manage Process Related Attributes & Methods
+/* Process Class To Manage Process Related Attributes & Methods */
 class Process {
-                        /* Process Related Attributes */
+    /* Process Related Attributes */
     // General Process Attributes
     private String name;
     private int arrivalTime;
@@ -165,7 +171,7 @@ class Process {
         this.agFactor = 0;
         this.remainingTime = 0;
     }
-    
+
     // Constructor to initialize or create new Process
     public Process(String name, int arrivalTime, int burstTime) {
         this(); // Calling Default Constructor To Initialize Attributes
@@ -173,53 +179,98 @@ class Process {
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
         this.remainingTime = burstTime;
+        this.waitingTime = 0;
     }
 
-                        /* Getters for process attributes */
-    public String getName() { return this.name; }
+    /* Getters for process attributes */
+    public String getName() {
+        return this.name;
+    }
 
-    public int getArrivalTime() { return this.arrivalTime; }
+    public int getArrivalTime() {
+        return this.arrivalTime;
+    }
 
-    public int getBurstTime() { return this.burstTime; }
+    public int getBurstTime() {
+        return this.burstTime;
+    }
 
-    public int getWaitingTime() { return this.waitingTime; }
+    public int getWaitingTime() {
+        return this.waitingTime;
+    }
 
-    public int getTurnAroundTime() { return this.turnaroundTime; }
+    public int getTurnAroundTime() {
+        return this.turnaroundTime;
+    }
 
-    public int getCompletionTime() { return this.completionTime; }
+    public int getCompletionTime() {
+        return this.completionTime;
+    }
 
-    public int getPriority() { return this.priorityNumber; }
+    public int getPriority() {
+        return this.priorityNumber;
+    }
 
-    public int getQuantum() { return this.quantum; }
+    public int getQuantum() {
+        return this.quantum;
+    }
 
-    public int getTempQuantum() { return this.tempQuantum; }
+    public int getTempQuantum() {
+        return this.tempQuantum;
+    }
 
-    public int getAGFactor() { return this.agFactor; }
+    public int getAGFactor() {
+        return this.agFactor;
+    }
 
-    public int getRemainingTime() { return this.remainingTime; }
+    public int getRemainingTime() {
+        return this.remainingTime;
+    }
 
-                        /* Setters for process attributes */
-    public void setName(String name) { this.name = name; }
+    /* Setters for process attributes */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void setArrivalTime(int arrivalTime) { this.arrivalTime = arrivalTime; }
+    public void setArrivalTime(int arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
 
-    public void setBurstTime(int burstTime) { this.burstTime = burstTime; }
+    public void setBurstTime(int burstTime) {
+        this.burstTime = burstTime;
+    }
 
-    public void setWaitingTime(int waitingTime) { this.waitingTime = waitingTime; }
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
 
-    public void setTurnAroundTime(int turnaroundTime) { this.turnaroundTime = turnaroundTime; }
+    public void setTurnAroundTime(int turnaroundTime) {
+        this.turnaroundTime = turnaroundTime;
+    }
 
-    public void setCompletionTime(int completionTime) { this.completionTime = completionTime; }
+    public void setCompletionTime(int completionTime) {
+        this.completionTime = completionTime;
+    }
 
-    public void setPriority(int priorityNumber) { this.priorityNumber = priorityNumber; }
+    public void setPriority(int priorityNumber) {
+        this.priorityNumber = priorityNumber;
+    }
 
-    public void setRemainingTime(int remainingTime) { this.remainingTime = remainingTime; }
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
+    }
 
-    public void setQuantum(int quantum) { this.quantum = quantum; }
+    public void setQuantum(int quantum) {
+        this.quantum = quantum;
+    }
 
-    public void setTempQuantum(int tempQuantum) { this.tempQuantum = tempQuantum; }
+    public void setTempQuantum(int tempQuantum) {
+        this.tempQuantum = tempQuantum;
+    }
 
-    public void setAGFactor(int agFactor) { this.agFactor = agFactor; }
+    public void setAGFactor(int agFactor) {
+        this.agFactor = agFactor;
+    }
 }
 
 // Abstract scheduler class to apply any scheduling algorithm
@@ -246,22 +297,23 @@ abstract class Scheduler {
     // Used to print the desired output after simulating the scheduling
     public void PrintOUTPUT() {
         // Print the execution order of the processes
-        System.out.println("\tExecution Order Of Processes");
+        System.out.println("----------Execution Order Of Processes----------");
         for (Process p : this.executionOrder())
             System.out.print(" => " + p.getName());
 
         // Print the waiting time of the processes
-        System.out.println("\n\tWaiting Time Of Processes");
+        System.out.println("\n----------Waiting Time Of Processes----------");
         for (Integer time : this.waitingTime())
             System.out.print(" => " + time);
 
         // Print the turnaround time of the processes
-        System.out.println("\n\tTurnaround Time Of Processes");
+        System.out.println("\n----------Turnaround Time Of Processes----------");
         for (Integer time : this.turnaroundTime())
             System.out.print(" => " + time);
 
         // Print the average waiting time of the processes
-        System.out.println("\nAverage Waiting Time: " + this.avgWaitingTime());
+        System.out.println("\n----------Average Calculations----------");
+        System.out.println("Average Waiting Time: " + this.avgWaitingTime());
         // Print the average turnaround time of the processes
         System.out.println("Average Turnaround Time: " + this.avgTurnaroundTime());
     }
@@ -298,7 +350,8 @@ class ShortestJobScheduler extends Scheduler {
         this.contextTime = 0;
     }
 
-    // Initialize the scheduler with a list of processes & the context switching time
+    // Initialize the scheduler with a list of processes & the context switching
+    // time
     public ShortestJobScheduler(List<Process> list, int c) {
         this();
         this.processes = list;
@@ -309,7 +362,9 @@ class ShortestJobScheduler extends Scheduler {
 
     // Return the execution order of the processes
     @Override
-    public List<Process> executionOrder() { return this.processes; }
+    public List<Process> executionOrder() {
+        return this.processes;
+    }
 
     // Return the waiting time of the processes
     @Override
@@ -331,22 +386,28 @@ class ShortestJobScheduler extends Scheduler {
 
     // Return the average waiting time of the processes
     @Override
-    public double avgWaitingTime() { return this.avgWaitingTime; }
+    public double avgWaitingTime() {
+        return this.avgWaitingTime;
+    }
 
     // Return the average turnaround time of the processes
     @Override
-    public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
+    public double avgTurnaroundTime() {
+        return this.avgTurnaroundTime;
+    }
 
     // Main function to run the scheduler
     @Override
     public void startScheduler() {
         int currentTime = 0;
-        int counter = 0; // to point to last process was arrived from process list (you can remove it and delete from front of process list)
+        int counter = 0; // to point to last process was arrived from process list (you can remove it and
+                         // delete from front of process list)
         List<Process> ArrivedProcesses = new ArrayList<Process>();
         List<Process> resultList = new ArrayList<Process>();
         processes.sort(new compareArrivedTime());
         while (resultList.size() != processes.size()) {
-            if (ArrivedProcesses.isEmpty()) { // to handle if there is process will arrive after all process was arrived done
+            if (ArrivedProcesses.isEmpty()) { // to handle if there is process will arrive after all process was arrived
+                                              // done
                 ArrivedProcesses.add(processes.get(counter++));
                 if (currentTime < ArrivedProcesses.get(0).getArrivalTime())
                     currentTime = ArrivedProcesses.get(0).getArrivalTime();
@@ -357,19 +418,21 @@ class ShortestJobScheduler extends Scheduler {
             }
             ArrivedProcesses.sort(new compareBurst());
             resultList.add(ArrivedProcesses.get(0));
-            resultList.get(resultList.size()-1).setWaitingTime(currentTime - resultList.get(resultList.size()-1).getArrivalTime());
-            avgWaitingTime += currentTime - resultList.get(resultList.size()-1).getArrivalTime();
+            resultList.get(resultList.size() - 1)
+                    .setWaitingTime(currentTime - resultList.get(resultList.size() - 1).getArrivalTime());
+            avgWaitingTime += currentTime - resultList.get(resultList.size() - 1).getArrivalTime();
             currentTime += ArrivedProcesses.get(0).getBurstTime();
-            resultList.get(resultList.size()-1).setCompletionTime(currentTime);
-            resultList.get(resultList.size()-1).setTurnAroundTime(currentTime - resultList.get(resultList.size()-1).getArrivalTime());
-            avgTurnaroundTime += currentTime - resultList.get(resultList.size()-1).getArrivalTime();
+            resultList.get(resultList.size() - 1).setCompletionTime(currentTime);
+            resultList.get(resultList.size() - 1)
+                    .setTurnAroundTime(currentTime - resultList.get(resultList.size() - 1).getArrivalTime());
+            avgTurnaroundTime += currentTime - resultList.get(resultList.size() - 1).getArrivalTime();
             ArrivedProcesses.remove(ArrivedProcesses.get(0));
             currentTime += contextTime;
         }
         processes = resultList;
         avgTurnaroundTime /= processes.size();
         avgWaitingTime /= processes.size();
-        System.out.println("\t\tShortest Job First Scheduler:\n");
+        System.out.println("\tShortest Job First Scheduler");
         super.PrintOUTPUT();
     }
 }
@@ -380,7 +443,7 @@ class SRTFScheduler extends Scheduler {
     private int currentTime;
     private double avgWaitingTime;
     private double avgTurnaroundTime;
-    
+
     // Default constructor
     public SRTFScheduler() {
         this.processes = new ArrayList<Process>();
@@ -397,7 +460,9 @@ class SRTFScheduler extends Scheduler {
 
     // Return the execution order of the processes
     @Override
-    public List<Process> executionOrder() { return this.processes; }
+    public List<Process> executionOrder() {
+        return this.processes;
+    }
 
     // Return the waiting time of the processes
     @Override
@@ -419,11 +484,15 @@ class SRTFScheduler extends Scheduler {
 
     // Return the average waiting time of the processes
     @Override
-    public double avgWaitingTime() { return this.avgWaitingTime; }
+    public double avgWaitingTime() {
+        return this.avgWaitingTime;
+    }
 
     // Return the average turnaround time of the processes
     @Override
-    public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
+    public double avgTurnaroundTime() {
+        return this.avgTurnaroundTime;
+    }
 
     // Main function to run the scheduler
     @Override
@@ -452,21 +521,25 @@ class SRTFScheduler extends Scheduler {
                 // Check for duplicates before adding the process to the ready queue
                 if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process))
                     readyQueue.add(process);
-            // Sort processes after every process execution to maintain the order of execution
+            // Sort processes after every process execution to maintain the order of
+            // execution
             readyQueue.sort(Comparator.comparingInt(process -> process.getRemainingTime()));
             // Store the shortest remaining time process, it'll always be the first element
-            // As the list is sorted in ascending order based on the remaining time of the processes
+            // As the list is sorted in ascending order based on the remaining time of the
+            // processes
             Process currentProcess = readyQueue.get(0);
             // Decrement its remaining time by 1, meaning it has executed 1 time unit
             currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
             currentTime++; // Move time forward by 1 second
-            // Check if the process is not the last process in the execution order list to prevent duplicates
+            // Check if the process is not the last process in the execution order list to
+            // prevent duplicates
             if (executionOrderList.isEmpty() || executionOrderList.get(executionOrderList.size() - 1) != currentProcess)
                 // Add the process to the execution order list
                 executionOrderList.add(currentProcess);
             // If the process finished its execution
             if (currentProcess.getRemainingTime() == 0) {
-                // Remove process from the ready queue & the original list as it has been executed
+                // Remove process from the ready queue & the original list as it has been
+                // executed
                 readyQueue.remove(currentProcess);
                 processes.remove(currentProcess);
                 // Set the process completion time by the current time
@@ -487,7 +560,7 @@ class SRTFScheduler extends Scheduler {
         avgWaitingTime /= numOfProcesses;
         avgTurnaroundTime /= numOfProcesses;
         // Print the name of the scheduler
-        System.out.println("\t\tShortest Remaining Time First (SRTF) Scheduler");
+        System.out.println("\tShortest Remaining Time First (SRTF) Scheduler");
         // Call the main function of the abstract class
         super.PrintOUTPUT();
     }
@@ -516,7 +589,9 @@ class PriorityScheduler extends Scheduler {
 
     // Return the execution order of the processes
     @Override
-    public List<Process> executionOrder() { return this.processes; }
+    public List<Process> executionOrder() {
+        return this.processes;
+    }
 
     // Return the waiting time of the processes
     @Override
@@ -538,11 +613,15 @@ class PriorityScheduler extends Scheduler {
 
     // Return the average waiting time of the processes
     @Override
-    public double avgWaitingTime() { return this.avgWaitingTime; }
+    public double avgWaitingTime() {
+        return this.avgWaitingTime;
+    }
 
     // Return the average turnaround time of the processes
     @Override
-    public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
+    public double avgTurnaroundTime() {
+        return this.avgTurnaroundTime;
+    }
 
     // Main function to run the scheduler
     @Override
@@ -572,7 +651,8 @@ class PriorityScheduler extends Scheduler {
                 if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process))
                     readyQueue.add(process);
             // Sort processes after every process execution to maintain the order
-            // The list is sorted in ascending order based on priority number, smallest number is the highest priority
+            // The list is sorted in ascending order based on priority number, smallest
+            // number is the highest priority
             readyQueue.sort(Comparator.comparingInt(process -> process.getPriority()));
             // Store the highest priority process based on the arrival time & priority
             Process currentProcess = readyQueue.get(0);
@@ -590,7 +670,8 @@ class PriorityScheduler extends Scheduler {
             avgTurnaroundTime += currentProcess.getTurnAroundTime();
             // Add the process to the execution order list
             executionOrderList.add(currentProcess);
-            // Remove process from the ready queue & the original list as it has been executed
+            // Remove process from the ready queue & the original list as it has been
+            // executed
             readyQueue.remove(currentProcess);
             processes.remove(currentProcess);
         }
@@ -600,7 +681,7 @@ class PriorityScheduler extends Scheduler {
         avgWaitingTime /= processes.size();
         avgTurnaroundTime /= processes.size();
         // Print the name of the scheduler
-        System.out.println("\t\tNon-Preemptive Priority Scheduler");
+        System.out.println("\tNon-Preemptive Priority Scheduler");
         // Call the main function of the abstract class
         super.PrintOUTPUT();
     }
@@ -717,7 +798,9 @@ class AGScheduler extends Scheduler {
 
     // Return the execution order of the processes
     @Override
-    public List<Process> executionOrder() { return this.mOutput; }
+    public List<Process> executionOrder() {
+        return this.mOutput;
+    }
 
     // Return the waiting time of the processes
     @Override
@@ -747,11 +830,15 @@ class AGScheduler extends Scheduler {
 
     // Return the average waiting time of the processes
     @Override
-    public double avgWaitingTime() { return this.avgWaitingTime; }
+    public double avgWaitingTime() {
+        return this.avgWaitingTime;
+    }
 
     // Return the average turnaround time of the processes
     @Override
-    public double avgTurnaroundTime() { return this.avgTurnaroundTime; }
+    public double avgTurnaroundTime() {
+        return this.avgTurnaroundTime;
+    }
 
     // Main function to run the scheduler
     @Override
