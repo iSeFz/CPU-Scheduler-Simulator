@@ -14,14 +14,31 @@ public class Process {
     private int quantum;
     private int tempQuantum;
     private int agFactor;
-    // Related ONLY to SJF & AG Scheduling
+    // Related ONLY to SRTF & AG Scheduling
     private int remainingTime;
 
+    // Default Constructor
+    public Process() {
+        this.name = "";
+        this.arrivalTime = 0;
+        this.burstTime = 0;
+        this.waitingTime = 0;
+        this.turnaroundTime = 0;
+        this.completionTime = 0;
+        this.priorityNumber = 0;
+        this.quantum = 0;
+        this.tempQuantum = 0;
+        this.agFactor = 0;
+        this.remainingTime = 0;
+    }
+    
     // Constructor to initialize or create new Process
     public Process(String name, int arrivalTime, int burstTime) {
+        this(); // Calling Default Constructor To Initialize Attributes
         this.name = name;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
+        this.remainingTime = burstTime;
         this.waitingTime = 0;
     }
 
