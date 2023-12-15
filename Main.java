@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
-// import java.util.Scanner;
+import java.util.Scanner;
 
 // Main class to run the program
 public class Main {
     public static void main(String[] args) {
-        /* System.out.println("\tWelcome to our CPU Scheduler Simulator!");
+        System.out.println("\tWelcome to our CPU Scheduler Simulator!");
         // Get the required input from the user at the start of the program
         Scanner scanner = new Scanner(System.in);
         System.out.print("Number of processes? ");
@@ -51,8 +51,8 @@ public class Main {
         int choice = scanner.nextInt();
         if (choice == 1) {
             System.out.println("\tMaintenance in progress!");
-            // ShortestJobScheduler SJF = new ShortestJobScheduler(processList, contextSwitchingTime);
-            // SJF.startScheduler();
+            ShortestJobScheduler SJF = new ShortestJobScheduler(processList, contextSwitchingTime);
+            SJF.startScheduler();
         } else if (choice == 2) {
             System.out.println("\tMaintenance in progress!");
             SRTFScheduler SRTF = new SRTFScheduler(processList);
@@ -62,11 +62,11 @@ public class Main {
             priority.startScheduler();
         } else if (choice == 4) {
             System.out.println("\tComing Soon!");
-            // AGScheduler AG = new AGScheduler();
-            // AG.startScheduler();
+            AGScheduler AG = new AGScheduler(processList);
+            AG.startScheduler();
         }
         scanner.close();
-        System.out.println("\tThanks for using our CPU Scheduler Simulator!"); */
+        System.out.println("\tThanks for using our CPU Scheduler Simulator!");
 
         /* // Priority Test Case
         Process p1 = new Process("P1", 0, 4);
@@ -91,7 +91,7 @@ public class Main {
         priority.startScheduler(); */
 
         // AG Assignment Sheet Test Case
-        Process p1 = new Process("P1", 0, 17);
+        /*Process p1 = new Process("P1", 0, 17);
         p1.setPriority(4);
         p1.setQuantum(4);
         p1.setAGFactor(20);
@@ -114,7 +114,7 @@ public class Main {
         processes.add(p3);
         processes.add(p4);
         SRTFScheduler srtfScheduler = new SRTFScheduler(processes);
-        srtfScheduler.startScheduler();
+        srtfScheduler.startScheduler();*/
         // Create a scheduler for the processes
 //        AGScheduler ag = new AGScheduler(processes);
 //        ag.startScheduler();
