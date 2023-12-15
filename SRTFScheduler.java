@@ -9,10 +9,12 @@ public class SRTFScheduler extends Scheduler {
     private int currentTime;
     private double avgWaitingTime;
     private double avgTurnaroundTime;
+    private int contextTime;
 
     // Constructor to initialize the scheduler with a list of processes
-    public SRTFScheduler(List<Process> processes) {
+    public SRTFScheduler(List<Process> processes , int c) {
         this.processes = processes;
+        contextTime = c;
         this.currentTime = 0;
         this.avgWaitingTime = 0;
         this.avgTurnaroundTime = 0;
@@ -65,24 +67,34 @@ public class SRTFScheduler extends Scheduler {
         List<Process> executionOrderList = new ArrayList<>();
         // List to store the arrived processes ready for execution
         List<Process> readyQueue = new ArrayList<>();
-
+        sortByArrivalTime(processes);
         // Continue scheduling until all processes are executed
-        while (!processes.isEmpty()) {
+        while (!processes.isEmpty() || !readyQueue.isEmpty()) {
             // some prints just to trace the code
-            System.out.println("Current Time: " + currentTime);
-            System.out.println("Processes: " + processes);
-            System.out.println("Ready Queue: " + readyQueue);
-            System.out.println("Execution Order: " + executionOrderList);
+//            System.out.println("Current Time: " + currentTime);
+//            System.out.println("Processes: " + processes);
+//            System.out.println("Ready Queue: " + readyQueue);
+//            System.out.println("Execution Order: " + executionOrderList);
 
             // Check for arrived processes and add them to the ready queue
-            for (Process process : processes) {
-                if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process)) {
-                    readyQueue.add(process);
-                }
+            if(readyQueue.isEmpty()){
+                readyQueue.add(processes.get(0));
+                if(processes.get(0).getArrivalTime() > currentTime)
+                    currentTime = processes.get(0).getArrivalTime();
+                processes.remove(0);
+            }
+//            for (Process process : processes) {
+//                if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process)) {
+//                    readyQueue.add(process);
+//                }
+//            }
+            while(!processes.isEmpty() && processes.get(0).getArrivalTime() <= currentTime){
+                readyQueue.add(processes.get(0));
+                processes.remove(0);
             }
 
             // Sort processes in the ready queue by arrival time
-            sortByArrivalTime(readyQueue);
+//            sortByArrivalTime(readyQueue);
             // Then sort by remaining time (in case of ties in arrival time)
             sortByRemainingTime(readyQueue);
 
@@ -91,28 +103,25 @@ public class SRTFScheduler extends Scheduler {
 
             // Update waiting time and remaining time for the current process
             currentProcess.setWaitingTime(currentTime - currentProcess.getArrivalTime());
-            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
-
+//            currentProcess.setRemainingTime(currentProcess.getRemainingTime() - 1);
+            currentProcess.setRemainingTime(0);
             // Increment the time by 1 second
-            currentTime++;
+//            currentTime++;
+            currentTime+= currentProcess.getBurstTime();
+            // Set completion time, turnaround time, and update averages
+            currentProcess.setCompletionTime(currentTime);
+            currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
+            avgWaitingTime += currentProcess.getWaitingTime();
+            avgTurnaroundTime += currentProcess.getTurnAroundTime();
+            currentTime+=contextTime;
 
-            // If the current process finishes its execution
-            if (currentProcess.getRemainingTime() == 0) {
-                // Set completion time, turnaround time, and update averages
-                currentProcess.setCompletionTime(currentTime);
-                currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
-                avgWaitingTime += currentProcess.getWaitingTime();
-                avgTurnaroundTime += currentProcess.getTurnAroundTime();
+            // Remove the finished process from the ready queue and processes list
+            readyQueue.remove(currentProcess);
 
-                // Remove the finished process from the ready queue and processes list
-                readyQueue.remove(currentProcess);
-                processes.remove(currentProcess);
-
-                // Add the process to the execution order list
-                executionOrderList.add(currentProcess);
-            }
+            // Add the process to the execution order list
+            executionOrderList.add(currentProcess);
         }
-
+        processes = executionOrderList;
         // Print scheduler information
         System.out.println("\t\tShortest Remaining Time First (SRTF) Scheduler");
         super.PrintOUTPUT();
